@@ -1,5 +1,7 @@
 <script setup lang="ts">
 import { Form, Head } from '@inertiajs/vue3';
+import { Package, Truck } from '@lucide/vue';
+import { ref } from 'vue';
 import InputError from '@/components/InputError.vue';
 import PasswordInput from '@/components/PasswordInput.vue';
 import TextLink from '@/components/TextLink.vue';
@@ -13,6 +15,8 @@ import { store } from '@/routes/register';
 defineProps<{
     passwordRules: string;
 }>();
+
+const role = ref<'customer' | 'transporter'>('customer');
 
 defineOptions({
     layout: {
@@ -32,6 +36,49 @@ defineOptions({
         class="flex flex-col gap-6"
     >
         <div class="grid gap-6">
+            <div class="grid gap-2">
+                <Label>I want to</Label>
+                <div class="grid grid-cols-2 gap-3">
+                    <label
+                        class="flex cursor-pointer flex-col items-center gap-1.5 rounded-lg border p-3 text-sm transition-colors"
+                        :class="
+                            role === 'customer'
+                                ? 'border-primary bg-primary/5'
+                                : 'border-input hover:bg-muted/50'
+                        "
+                    >
+                        <input
+                            type="radio"
+                            name="role"
+                            value="customer"
+                            v-model="role"
+                            class="sr-only"
+                        />
+                        <Package class="size-5" />
+                        Ship cargo
+                    </label>
+                    <label
+                        class="flex cursor-pointer flex-col items-center gap-1.5 rounded-lg border p-3 text-sm transition-colors"
+                        :class="
+                            role === 'transporter'
+                                ? 'border-primary bg-primary/5'
+                                : 'border-input hover:bg-muted/50'
+                        "
+                    >
+                        <input
+                            type="radio"
+                            name="role"
+                            value="transporter"
+                            v-model="role"
+                            class="sr-only"
+                        />
+                        <Truck class="size-5" />
+                        Transport cargo
+                    </label>
+                </div>
+                <InputError :message="errors.role" />
+            </div>
+
             <div class="grid gap-2">
                 <Label for="name">Name</Label>
                 <Input
@@ -59,6 +106,19 @@ defineOptions({
                     placeholder="email@example.com"
                 />
                 <InputError :message="errors.email" />
+            </div>
+
+            <div v-if="role === 'transporter'" class="grid gap-2">
+                <Label for="phone">Phone</Label>
+                <Input
+                    id="phone"
+                    type="tel"
+                    required
+                    autocomplete="tel"
+                    name="phone"
+                    placeholder="+504 9999-9999"
+                />
+                <InputError :message="errors.phone" />
             </div>
 
             <div class="grid gap-2">
