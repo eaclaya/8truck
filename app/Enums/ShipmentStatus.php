@@ -2,7 +2,9 @@
 
 namespace App\Enums;
 
-enum ShipmentStatus: string
+use Filament\Support\Contracts\HasLabel;
+
+enum ShipmentStatus: string implements HasLabel
 {
     case Draft = 'draft';
     case Published = 'published';
@@ -35,6 +37,23 @@ enum ShipmentStatus: string
             self::Delivered => [self::Completed],
             self::Completed, self::Cancelled, self::Expired => [],
         };
+    }
+
+    public function getLabel(): string
+    {
+        return __('ui.'.match ($this) {
+            self::Draft => 'Draft',
+            self::Published => 'Published',
+            self::Quoted => 'Quoted',
+            self::Accepted => 'Accepted',
+            self::DriverAssigned => 'Driver assigned',
+            self::PickedUp => 'Picked up',
+            self::InTransit => 'In transit',
+            self::Delivered => 'Delivered',
+            self::Completed => 'Completed',
+            self::Cancelled => 'Cancelled',
+            self::Expired => 'Expired',
+        });
     }
 
     public function canTransitionTo(self $status): bool

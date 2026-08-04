@@ -173,4 +173,9 @@ return [
     'No ratings yet.' => 'Aún no hay calificaciones.',
     'Return load available' => 'Carga de retorno disponible',
     'Rated' => 'Calificado',
+    'Approved' => 'Aprobado',
+    'Driver license' => 'Licencia de conducir',
+    'National ID' => 'Documento de identidad',
+    'Insurance' => 'Seguro',
+    'Business registration' => 'Registro mercantil',
 ];

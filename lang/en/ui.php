@@ -163,4 +163,9 @@ return [
     'No ratings yet.' => 'No ratings yet.',
     'Return load available' => 'Return load available',
     'Rated' => 'Rated',
+    'Approved' => 'Approved',
+    'Driver license' => 'Driver license',
+    'National ID' => 'National ID',
+    'Insurance' => 'Insurance',
+    'Business registration' => 'Business registration',
 ];

@@ -8,6 +8,14 @@ use App\Models\User;
 
 class ShipmentPolicy
 {
+    /**
+     * Admins manage everything through the Filament panel.
+     */
+    public function before(User $user): ?bool
+    {
+        return $user->hasRole('admin') ? true : null;
+    }
+
     public function view(User $user, Shipment $shipment): bool
     {
         return $shipment->customer_id === $user->id;
