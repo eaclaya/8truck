@@ -44,6 +44,7 @@ use MatanYadaev\EloquentSpatial\Traits\HasSpatial;
  * @property CarbonImmutable|null $expires_at
  * @property CarbonImmutable|null $delivered_at
  * @property CarbonImmutable|null $completed_at
+ * @property-read bool|null $has_my_quote Set by FindAvailableLoadsAction's withExists.
  */
 #[Fillable([
     'customer_id', 'company_id', 'truck_type_id',

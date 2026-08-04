@@ -29,4 +29,30 @@ class ShipmentPolicy
         return $shipment->customer_id === $user->id
             && $shipment->status === ShipmentStatus::Quoted;
     }
+
+    public function complete(User $user, Shipment $shipment): bool
+    {
+        return $shipment->customer_id === $user->id
+            && $shipment->status === ShipmentStatus::Delivered;
+    }
+
+    /**
+     * A transporter may browse an open load that is not their own shipment.
+     */
+    public function viewAsLoad(User $user, Shipment $shipment): bool
+    {
+        return $user->transporterProfile !== null
+            && $shipment->customer_id !== $user->id
+            && ($shipment->status->isOpenForQuotes()
+                || $shipment->quotes()->where('transporter_profile_id', $user->transporterProfile->id)->exists());
+    }
+
+    /**
+     * The assigned transporter may advance the delivery status.
+     */
+    public function advance(User $user, Shipment $shipment): bool
+    {
+        return $user->transporterProfile !== null
+            && $shipment->assigned_transporter_id === $user->transporterProfile->id;
+    }
 }

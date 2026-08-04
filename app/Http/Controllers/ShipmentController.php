@@ -128,6 +128,7 @@ class ShipmentController extends Controller
             'can' => [
                 'publish' => $request->user()->can('publish', $shipment),
                 'acceptQuote' => $request->user()->can('acceptQuote', $shipment),
+                'complete' => $request->user()->can('complete', $shipment),
             ],
         ]);
     }

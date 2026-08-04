@@ -7,7 +7,7 @@ import { Spinner } from '@/components/ui/spinner';
 import { useTrans } from '@/composables/useTrans';
 import { dashboard } from '@/routes';
 import { accept } from '@/routes/quotes';
-import shipments, { publish } from '@/routes/shipments';
+import shipments, { complete, publish } from '@/routes/shipments';
 
 interface ShipmentDetail {
     id: number;
@@ -58,6 +58,7 @@ defineProps<{
     can: {
         publish: boolean;
         acceptQuote: boolean;
+        complete: boolean;
     };
 }>();
 
@@ -100,6 +101,18 @@ const { t } = useTrans();
                         t('Publish shipment')
                     }}</Button
                 >
+                <InputError :message="errors.shipment" />
+            </Form>
+
+            <Form
+                v-if="can.complete"
+                v-bind="complete.form(shipment.id)"
+                v-slot="{ errors, processing }"
+            >
+                <Button type="submit" :disabled="processing">
+                    <Spinner v-if="processing" />
+                    {{ t('Complete shipment') }}
+                </Button>
                 <InputError :message="errors.shipment" />
             </Form>
         </div>

@@ -1,6 +1,15 @@
 <script setup lang="ts">
-import { Link } from '@inertiajs/vue3';
-import { BookOpen, FolderGit2, LayoutGrid, Package } from '@lucide/vue';
+import { Link, usePage } from '@inertiajs/vue3';
+import {
+    BookOpen,
+    Briefcase,
+    FolderGit2,
+    LayoutGrid,
+    Package,
+    Search,
+    Truck,
+} from '@lucide/vue';
+import { computed } from 'vue';
 import AppLogo from '@/components/AppLogo.vue';
 import NavFooter from '@/components/NavFooter.vue';
 import NavMain from '@/components/NavMain.vue';
@@ -15,21 +24,50 @@ import {
     SidebarMenuItem,
 } from '@/components/ui/sidebar';
 import { dashboard } from '@/routes';
+import jobs from '@/routes/jobs';
+import loads from '@/routes/loads';
 import shipments from '@/routes/shipments';
+import trucks from '@/routes/trucks';
 import type { NavItem } from '@/types';
 
-const mainNavItems: NavItem[] = [
-    {
-        title: 'Dashboard',
-        href: dashboard(),
-        icon: LayoutGrid,
-    },
-    {
-        title: 'Shipments',
-        href: shipments.index(),
-        icon: Package,
-    },
-];
+const page = usePage();
+
+const mainNavItems = computed<NavItem[]>(() => {
+    const items: NavItem[] = [
+        {
+            title: 'Dashboard',
+            href: dashboard(),
+            icon: LayoutGrid,
+        },
+        {
+            title: 'Shipments',
+            href: shipments.index(),
+            icon: Package,
+        },
+    ];
+
+    if (page.props.auth.isTransporter) {
+        items.push(
+            {
+                title: 'Loads',
+                href: loads.index(),
+                icon: Search,
+            },
+            {
+                title: 'Jobs',
+                href: jobs.index(),
+                icon: Briefcase,
+            },
+            {
+                title: 'Trucks',
+                href: trucks.index(),
+                icon: Truck,
+            },
+        );
+    }
+
+    return items;
+});
 
 const footerNavItems: NavItem[] = [
     {

@@ -40,6 +40,7 @@ class HandleInertiaRequests extends Middleware
             'name' => config('app.name'),
             'auth' => [
                 'user' => $request->user(),
+                'isTransporter' => $request->user()?->transporterProfile !== null,
             ],
             'locale' => app()->getLocale(),
             'translations' => fn (): array => trans('ui'),
