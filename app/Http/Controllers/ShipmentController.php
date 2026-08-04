@@ -83,6 +83,7 @@ class ShipmentController extends Controller
                 'truck.truckType:id,name',
             ])->orderBy('amount'),
             'statusHistories' => fn ($query) => $query->with('actor:id,name')->latest(),
+            'ratings' => fn ($query) => $query->with('rater:id,name'),
         ]);
 
         return Inertia::render('shipments/Show', [
@@ -125,10 +126,17 @@ class ShipmentController extends Controller
                 'notes' => $history->notes,
                 'created_at' => $history->created_at?->toDateTimeString(),
             ]),
+            'ratings' => $shipment->ratings->map(fn ($rating) => [
+                'id' => $rating->id,
+                'score' => $rating->score,
+                'comment' => $rating->comment,
+                'rater' => $rating->rater->name,
+            ]),
             'can' => [
                 'publish' => $request->user()->can('publish', $shipment),
                 'acceptQuote' => $request->user()->can('acceptQuote', $shipment),
                 'complete' => $request->user()->can('complete', $shipment),
+                'rate' => $request->user()->can('rate', $shipment),
             ],
         ]);
     }

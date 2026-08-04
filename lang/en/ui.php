@@ -155,4 +155,12 @@ return [
     'Save truck' => 'Save truck',
     'Delete' => 'Delete',
     'Select a type' => 'Select a type',
+    'Ratings' => 'Ratings',
+    'Rate transporter' => 'Rate transporter',
+    'Rate customer' => 'Rate customer',
+    'Comment (optional)' => 'Comment (optional)',
+    'Submit rating' => 'Submit rating',
+    'No ratings yet.' => 'No ratings yet.',
+    'Return load available' => 'Return load available',
+    'Rated' => 'Rated',
 ];

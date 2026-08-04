@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { Form, Head } from '@inertiajs/vue3';
 import InputError from '@/components/InputError.vue';
+import RatingForm from '@/components/RatingForm.vue';
 import ShipmentStatusBadge from '@/components/ShipmentStatusBadge.vue';
 import { Button } from '@/components/ui/button';
 import { Spinner } from '@/components/ui/spinner';
@@ -42,6 +43,13 @@ interface QuoteRow {
     truck: string | null;
 }
 
+interface RatingRow {
+    id: number;
+    score: number;
+    comment: string | null;
+    rater: string;
+}
+
 interface HistoryRow {
     id: number;
     from_status: string | null;
@@ -55,10 +63,12 @@ defineProps<{
     shipment: ShipmentDetail;
     quotes: QuoteRow[];
     histories: HistoryRow[];
+    ratings: RatingRow[];
     can: {
         publish: boolean;
         acceptQuote: boolean;
         complete: boolean;
+        rate: boolean;
     };
 }>();
 
@@ -300,6 +310,45 @@ const { t } = useTrans();
                     </div>
                 </li>
             </ul>
+        </div>
+
+        <div
+            v-if="shipment.status === 'completed'"
+            class="rounded-xl border border-sidebar-border/70 p-4 dark:border-sidebar-border"
+        >
+            <h2 class="mb-3 font-medium">{{ t('Ratings') }}</h2>
+
+            <p
+                v-if="ratings.length === 0 && !can.rate"
+                class="text-sm text-muted-foreground"
+            >
+                {{ t('No ratings yet.') }}
+            </p>
+
+            <ul v-if="ratings.length > 0" class="mb-4 grid gap-2 text-sm">
+                <li
+                    v-for="rating in ratings"
+                    :key="rating.id"
+                    class="flex flex-col"
+                >
+                    <span>
+                        <span class="font-medium">{{ rating.rater }}</span>
+                        <span class="ml-2 text-amber-500">{{
+                            '★'.repeat(rating.score)
+                        }}</span>
+                    </span>
+                    <span v-if="rating.comment" class="text-muted-foreground">
+                        "{{ rating.comment }}"
+                    </span>
+                </li>
+            </ul>
+
+            <RatingForm
+                v-if="can.rate"
+                :shipment-id="shipment.id"
+                title="Rate transporter"
+                class="max-w-sm"
+            />
         </div>
     </div>
 </template>

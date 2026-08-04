@@ -7,4 +7,7 @@ return [
     'own_shipment' => 'A transporter cannot quote their own shipment.',
     'quote_not_pending' => 'The quote is no longer pending and cannot be accepted.',
     'not_shipment_owner' => 'Only the shipment owner can perform this action.',
+    'not_rateable' => 'Ratings are only available once the shipment is completed.',
+    'already_rated' => 'You have already rated this shipment.',
+    'not_participant' => 'Only participants of the shipment can rate it.',
 ];

@@ -36,4 +36,19 @@ class ShipmentException extends DomainException
     {
         return new self(__('marketplace.not_shipment_owner'));
     }
+
+    public static function notRateable(): self
+    {
+        return new self(__('marketplace.not_rateable'));
+    }
+
+    public static function alreadyRated(): self
+    {
+        return new self(__('marketplace.already_rated'));
+    }
+
+    public static function notParticipant(): self
+    {
+        return new self(__('marketplace.not_participant'));
+    }
 }

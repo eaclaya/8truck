@@ -6,6 +6,7 @@ use App\Http\Controllers\CompleteShipmentController;
 use App\Http\Controllers\JobController;
 use App\Http\Controllers\LoadController;
 use App\Http\Controllers\PublishShipmentController;
+use App\Http\Controllers\RateShipmentController;
 use App\Http\Controllers\ShipmentController;
 use App\Http\Controllers\SubmitQuoteController;
 use App\Http\Controllers\TruckController;
@@ -20,6 +21,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::resource('shipments', ShipmentController::class)->only(['index', 'create', 'store', 'show']);
     Route::post('shipments/{shipment}/publish', PublishShipmentController::class)->name('shipments.publish');
     Route::post('shipments/{shipment}/complete', CompleteShipmentController::class)->name('shipments.complete');
+    Route::post('shipments/{shipment}/ratings', RateShipmentController::class)->name('shipments.rate');
     Route::post('quotes/{quote}/accept', AcceptQuoteController::class)->name('quotes.accept');
 
     // Transporter

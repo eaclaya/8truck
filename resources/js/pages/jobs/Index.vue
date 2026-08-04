@@ -1,12 +1,24 @@
 <script setup lang="ts">
 import { Form, Head } from '@inertiajs/vue3';
+import { Link } from '@inertiajs/vue3';
 import InputError from '@/components/InputError.vue';
+import RatingForm from '@/components/RatingForm.vue';
 import ShipmentStatusBadge from '@/components/ShipmentStatusBadge.vue';
 import { Button } from '@/components/ui/button';
 import { Spinner } from '@/components/ui/spinner';
 import { useTrans } from '@/composables/useTrans';
 import { dashboard } from '@/routes';
 import jobRoutes, { advance } from '@/routes/jobs';
+import loadRoutes from '@/routes/loads';
+
+interface ReturnTrip {
+    id: number;
+    origin_city: string | null;
+    destination_city: string | null;
+    pickup_date: string;
+    budget_amount: string | null;
+    currency: string;
+}
 
 interface JobRow {
     id: number;
@@ -19,6 +31,8 @@ interface JobRow {
     customer_name: string;
     amount: string | null;
     currency: string;
+    can_rate: boolean;
+    return_trips: ReturnTrip[];
 }
 
 interface PaginationLink {
@@ -81,56 +95,103 @@ const { t } = useTrans();
                     </tr>
                 </thead>
                 <tbody>
-                    <tr
-                        v-for="job in jobs.data"
-                        :key="job.id"
-                        class="border-b border-sidebar-border/40 last:border-0 hover:bg-muted/50 dark:border-sidebar-border/40"
-                    >
-                        <td class="px-4 py-3 font-medium">
-                            {{ job.origin_city }} → {{ job.destination_city }}
-                        </td>
-                        <td class="px-4 py-3">{{ job.customer_name }}</td>
-                        <td class="px-4 py-3">{{ job.pickup_date }}</td>
-                        <td class="px-4 py-3">
-                            {{
-                                job.amount
-                                    ? `${job.currency} ${Number(job.amount).toLocaleString()}`
-                                    : '—'
-                            }}
-                        </td>
-                        <td class="px-4 py-3">
-                            <ShipmentStatusBadge :status="job.status" />
-                        </td>
-                        <td class="px-4 py-3 text-right">
-                            <Form
-                                v-if="job.next_status"
-                                v-bind="advance.form(job.id)"
-                                v-slot="{ errors, processing }"
-                            >
-                                <input
-                                    type="hidden"
-                                    name="status"
-                                    :value="job.next_status"
-                                />
-                                <Button
-                                    type="submit"
-                                    size="sm"
-                                    variant="outline"
-                                    :disabled="processing"
+                    <template v-for="job in jobs.data" :key="job.id">
+                        <tr
+                            class="border-b border-sidebar-border/40 hover:bg-muted/50 dark:border-sidebar-border/40"
+                        >
+                            <td class="px-4 py-3 font-medium">
+                                {{ job.origin_city }} →
+                                {{ job.destination_city }}
+                            </td>
+                            <td class="px-4 py-3">{{ job.customer_name }}</td>
+                            <td class="px-4 py-3">{{ job.pickup_date }}</td>
+                            <td class="px-4 py-3">
+                                {{
+                                    job.amount
+                                        ? `${job.currency} ${Number(job.amount).toLocaleString()}`
+                                        : '—'
+                                }}
+                            </td>
+                            <td class="px-4 py-3">
+                                <ShipmentStatusBadge :status="job.status" />
+                            </td>
+                            <td class="px-4 py-3 text-right">
+                                <Form
+                                    v-if="job.next_status"
+                                    v-bind="advance.form(job.id)"
+                                    v-slot="{ errors, processing }"
                                 >
-                                    <Spinner v-if="processing" />
-                                    {{ t('advance.' + job.next_status) }}
-                                </Button>
-                                <InputError :message="errors.status" />
-                            </Form>
-                            <span
-                                v-else-if="job.status === 'delivered'"
-                                class="text-xs text-muted-foreground"
-                            >
-                                {{ t('Waiting for customer confirmation') }}
-                            </span>
-                        </td>
-                    </tr>
+                                    <input
+                                        type="hidden"
+                                        name="status"
+                                        :value="job.next_status"
+                                    />
+                                    <Button
+                                        type="submit"
+                                        size="sm"
+                                        variant="outline"
+                                        :disabled="processing"
+                                    >
+                                        <Spinner v-if="processing" />
+                                        {{ t('advance.' + job.next_status) }}
+                                    </Button>
+                                    <InputError :message="errors.status" />
+                                </Form>
+                                <span
+                                    v-else-if="job.status === 'delivered'"
+                                    class="text-xs text-muted-foreground"
+                                >
+                                    {{ t('Waiting for customer confirmation') }}
+                                </span>
+                            </td>
+                        </tr>
+                        <tr
+                            v-if="job.return_trips.length > 0"
+                            class="border-b border-sidebar-border/40 bg-emerald-50/60 dark:border-sidebar-border/40 dark:bg-emerald-950/20"
+                        >
+                            <td colspan="6" class="px-4 py-2 text-sm">
+                                <span
+                                    class="font-medium text-emerald-700 dark:text-emerald-300"
+                                >
+                                    {{ t('Return load available') }}:
+                                </span>
+                                <template
+                                    v-for="(trip, index) in job.return_trips"
+                                    :key="trip.id"
+                                >
+                                    <span v-if="index > 0"> · </span>
+                                    <Link
+                                        :href="loadRoutes.show(trip.id)"
+                                        class="underline underline-offset-2 hover:text-emerald-700 dark:hover:text-emerald-300"
+                                    >
+                                        {{ trip.origin_city }} →
+                                        {{ trip.destination_city }} ({{
+                                            trip.pickup_date
+                                        }}<template v-if="trip.budget_amount"
+                                            >, {{ trip.currency }}
+                                            {{
+                                                Number(
+                                                    trip.budget_amount,
+                                                ).toLocaleString()
+                                            }}</template
+                                        >)
+                                    </Link>
+                                </template>
+                            </td>
+                        </tr>
+                        <tr
+                            v-if="job.can_rate"
+                            class="border-b border-sidebar-border/40 dark:border-sidebar-border/40"
+                        >
+                            <td colspan="6" class="px-4 py-3">
+                                <RatingForm
+                                    :shipment-id="job.id"
+                                    title="Rate customer"
+                                    class="max-w-sm"
+                                />
+                            </td>
+                        </tr>
+                    </template>
                 </tbody>
             </table>
         </div>

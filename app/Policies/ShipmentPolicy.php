@@ -48,6 +48,23 @@ class ShipmentPolicy
     }
 
     /**
+     * Participants of a completed shipment may rate the counterparty once.
+     */
+    public function rate(User $user, Shipment $shipment): bool
+    {
+        if ($shipment->status !== ShipmentStatus::Completed) {
+            return false;
+        }
+
+        $isParticipant = $shipment->customer_id === $user->id
+            || ($user->transporterProfile !== null
+                && $shipment->assigned_transporter_id === $user->transporterProfile->id);
+
+        return $isParticipant
+            && ! $shipment->ratings()->where('rater_id', $user->id)->exists();
+    }
+
+    /**
      * The assigned transporter may advance the delivery status.
      */
     public function advance(User $user, Shipment $shipment): bool

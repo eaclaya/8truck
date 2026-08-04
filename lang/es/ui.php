@@ -165,4 +165,12 @@ return [
     'Save truck' => 'Guardar camión',
     'Delete' => 'Eliminar',
     'Select a type' => 'Selecciona un tipo',
+    'Ratings' => 'Calificaciones',
+    'Rate transporter' => 'Calificar transportista',
+    'Rate customer' => 'Calificar cliente',
+    'Comment (optional)' => 'Comentario (opcional)',
+    'Submit rating' => 'Enviar calificación',
+    'No ratings yet.' => 'Aún no hay calificaciones.',
+    'Return load available' => 'Carga de retorno disponible',
+    'Rated' => 'Calificado',
 ];
