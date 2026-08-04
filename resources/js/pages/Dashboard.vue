@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { Head } from '@inertiajs/vue3';
 import PlaceholderPattern from '@/components/PlaceholderPattern.vue';
+import { useTrans } from '@/composables/useTrans';
 import { dashboard } from '@/routes';
 
 defineOptions({
@@ -13,10 +14,12 @@ defineOptions({
         ],
     },
 });
+
+const { t } = useTrans();
 </script>
 
 <template>
-    <Head title="Dashboard" />
+    <Head :title="t('Dashboard')" />
 
     <div
         class="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4"

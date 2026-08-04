@@ -3,6 +3,7 @@ import { Head, Link } from '@inertiajs/vue3';
 import { Plus } from '@lucide/vue';
 import ShipmentStatusBadge from '@/components/ShipmentStatusBadge.vue';
 import { Button } from '@/components/ui/button';
+import { useTrans } from '@/composables/useTrans';
 import { dashboard } from '@/routes';
 import shipmentRoutes from '@/routes/shipments';
 
@@ -41,19 +42,20 @@ defineOptions({
         ],
     },
 });
+
+const { t } = useTrans();
 </script>
 
 <template>
-    <Head title="Shipments" />
+    <Head :title="t('Shipments')" />
 
     <div class="flex h-full flex-1 flex-col gap-4 p-4">
         <div class="flex items-center justify-between">
-            <h1 class="text-xl font-semibold">My shipments</h1>
+            <h1 class="text-xl font-semibold">{{ t('My shipments') }}</h1>
             <Button as-child>
                 <Link :href="shipmentRoutes.create()">
-                    <Plus class="size-4" />
-                    New shipment
-                </Link>
+                    <Plus class="size-4" />{{ t('New shipment') }}</Link
+                >
             </Button>
         </div>
 
@@ -62,13 +64,16 @@ defineOptions({
             class="flex flex-1 flex-col items-center justify-center gap-3 rounded-xl border border-dashed border-sidebar-border/70 p-12 text-center dark:border-sidebar-border"
         >
             <p class="text-muted-foreground">
-                You have no shipments yet. Create one to start receiving quotes
-                from transporters.
+                {{
+                    t(
+                        'You have no shipments yet. Create one to start receiving quotes from transporters.',
+                    )
+                }}
             </p>
             <Button as-child>
-                <Link :href="shipmentRoutes.create()"
-                    >Create your first shipment</Link
-                >
+                <Link :href="shipmentRoutes.create()">{{
+                    t('Create your first shipment')
+                }}</Link>
             </Button>
         </div>
 
@@ -81,11 +86,11 @@ defineOptions({
                     <tr
                         class="border-b border-sidebar-border/70 text-left text-muted-foreground dark:border-sidebar-border"
                     >
-                        <th class="px-4 py-3 font-medium">Route</th>
-                        <th class="px-4 py-3 font-medium">Pickup</th>
-                        <th class="px-4 py-3 font-medium">Cargo</th>
-                        <th class="px-4 py-3 font-medium">Quotes</th>
-                        <th class="px-4 py-3 font-medium">Status</th>
+                        <th class="px-4 py-3 font-medium">{{ t('Route') }}</th>
+                        <th class="px-4 py-3 font-medium">{{ t('Pickup') }}</th>
+                        <th class="px-4 py-3 font-medium">{{ t('Cargo') }}</th>
+                        <th class="px-4 py-3 font-medium">{{ t('Quotes') }}</th>
+                        <th class="px-4 py-3 font-medium">{{ t('Status') }}</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -105,7 +110,7 @@ defineOptions({
                         </td>
                         <td class="px-4 py-3">{{ shipment.pickup_date }}</td>
                         <td class="px-4 py-3 capitalize">
-                            {{ shipment.cargo_type }}
+                            {{ t('cargo.' + shipment.cargo_type) }}
                         </td>
                         <td class="px-4 py-3">{{ shipment.quotes_count }}</td>
                         <td class="px-4 py-3">

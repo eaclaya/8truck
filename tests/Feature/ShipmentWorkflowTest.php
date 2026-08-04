@@ -74,8 +74,9 @@ test('a transporter cannot quote their own shipment', function () {
     $transporter = TransporterProfile::factory()->create();
     $shipment = Shipment::factory()->published()->create(['customer_id' => $transporter->user_id]);
 
-    app(SubmitQuoteAction::class)->execute($transporter, $shipment, ['amount' => 1000]);
-})->throws(ShipmentException::class, 'cannot quote their own shipment');
+    expect(fn () => app(SubmitQuoteAction::class)->execute($transporter, $shipment, ['amount' => 1000]))
+        ->toThrow(ShipmentException::class, __('marketplace.own_shipment'));
+});
 
 test('a transporter cannot quote the same shipment twice', function () {
     $shipment = Shipment::factory()->published()->create();
@@ -83,15 +84,18 @@ test('a transporter cannot quote the same shipment twice', function () {
     $submit = app(SubmitQuoteAction::class);
 
     $submit->execute($transporter, $shipment, ['amount' => 1000]);
-    $submit->execute($transporter, $shipment, ['amount' => 900]);
-})->throws(ShipmentException::class, 'already submitted a quote');
+
+    expect(fn () => $submit->execute($transporter, $shipment, ['amount' => 900]))
+        ->toThrow(ShipmentException::class, __('marketplace.already_quoted'));
+});
 
 test('quotes are rejected while the shipment is not open', function () {
     $shipment = Shipment::factory()->create();
     $transporter = TransporterProfile::factory()->create();
 
-    app(SubmitQuoteAction::class)->execute($transporter, $shipment, ['amount' => 1000]);
-})->throws(ShipmentException::class, 'cannot be submitted');
+    expect(fn () => app(SubmitQuoteAction::class)->execute($transporter, $shipment, ['amount' => 1000]))
+        ->toThrow(ShipmentException::class, __('marketplace.not_open_for_quotes', ['status' => 'draft']));
+});
 
 test('accepting a quote assigns the transporter and rejects competitors', function () {
     $shipment = Shipment::factory()->quoted()->create();
@@ -126,8 +130,9 @@ test('only the shipment owner can accept a quote', function () {
     $quote = Quote::factory()->for($shipment)->create();
     $stranger = User::factory()->create();
 
-    app(AcceptQuoteAction::class)->execute($stranger, $quote);
-})->throws(ShipmentException::class, 'Only the shipment owner');
+    expect(fn () => app(AcceptQuoteAction::class)->execute($stranger, $quote))
+        ->toThrow(ShipmentException::class, __('marketplace.not_shipment_owner'));
+});
 
 test('completing a delivered shipment records the commission shadow ledger', function () {
     config()->set('marketplace.commission_rate', 0.0);

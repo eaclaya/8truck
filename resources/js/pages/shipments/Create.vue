@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Spinner } from '@/components/ui/spinner';
+import { useTrans } from '@/composables/useTrans';
 import { dashboard } from '@/routes';
 import shipments from '@/routes/shipments';
 
@@ -59,25 +60,29 @@ function submit() {
         budget_amount: data.budget_amount === '' ? null : data.budget_amount,
     })).post(shipments.store().url);
 }
+
+const { t } = useTrans();
 </script>
 
 <template>
-    <Head title="New shipment" />
+    <Head :title="t('New shipment')" />
 
     <div class="flex h-full flex-1 flex-col gap-4 p-4">
-        <h1 class="text-xl font-semibold">Create a shipment</h1>
+        <h1 class="text-xl font-semibold">{{ t('Create a shipment') }}</h1>
 
         <form @submit.prevent="submit" class="grid max-w-2xl gap-6">
             <div class="grid gap-4 sm:grid-cols-2">
                 <div class="grid gap-2">
-                    <Label for="origin_city_id">Origin city</Label>
+                    <Label for="origin_city_id">{{ t('Origin city') }}</Label>
                     <select
                         id="origin_city_id"
                         v-model="form.origin_city_id"
                         required
                         :class="selectClasses"
                     >
-                        <option value="" disabled>Select a city</option>
+                        <option value="" disabled>
+                            {{ t('Select a city') }}
+                        </option>
                         <option
                             v-for="city in cities"
                             :key="city.id"
@@ -90,14 +95,18 @@ function submit() {
                 </div>
 
                 <div class="grid gap-2">
-                    <Label for="destination_city_id">Destination city</Label>
+                    <Label for="destination_city_id">{{
+                        t('Destination city')
+                    }}</Label>
                     <select
                         id="destination_city_id"
                         v-model="form.destination_city_id"
                         required
                         :class="selectClasses"
                     >
-                        <option value="" disabled>Select a city</option>
+                        <option value="" disabled>
+                            {{ t('Select a city') }}
+                        </option>
                         <option
                             v-for="city in cities"
                             :key="city.id"
@@ -110,29 +119,33 @@ function submit() {
                 </div>
 
                 <div class="grid gap-2">
-                    <Label for="origin_address">Pickup address</Label>
+                    <Label for="origin_address">{{
+                        t('Pickup address')
+                    }}</Label>
                     <Input
                         id="origin_address"
                         v-model="form.origin_address"
                         required
-                        placeholder="Street, neighborhood, references"
+                        :placeholder="t('Street, neighborhood, references')"
                     />
                     <InputError :message="form.errors.origin_address" />
                 </div>
 
                 <div class="grid gap-2">
-                    <Label for="destination_address">Delivery address</Label>
+                    <Label for="destination_address">{{
+                        t('Delivery address')
+                    }}</Label>
                     <Input
                         id="destination_address"
                         v-model="form.destination_address"
                         required
-                        placeholder="Street, neighborhood, references"
+                        :placeholder="t('Street, neighborhood, references')"
                     />
                     <InputError :message="form.errors.destination_address" />
                 </div>
 
                 <div class="grid gap-2">
-                    <Label for="pickup_date">Pickup date</Label>
+                    <Label for="pickup_date">{{ t('Pickup date') }}</Label>
                     <Input
                         id="pickup_date"
                         v-model="form.pickup_date"
@@ -143,7 +156,7 @@ function submit() {
                 </div>
 
                 <div class="grid gap-2">
-                    <Label for="cargo_type">Cargo type</Label>
+                    <Label for="cargo_type">{{ t('Cargo type') }}</Label>
                     <select
                         id="cargo_type"
                         v-model="form.cargo_type"
@@ -156,14 +169,16 @@ function submit() {
                             :value="type"
                             class="capitalize"
                         >
-                            {{ type }}
+                            {{ t('cargo.' + type) }}
                         </option>
                     </select>
                     <InputError :message="form.errors.cargo_type" />
                 </div>
 
                 <div class="grid gap-2">
-                    <Label for="weight_kg">Weight (kg, optional)</Label>
+                    <Label for="weight_kg">{{
+                        t('Weight (kg, optional)')
+                    }}</Label>
                     <Input
                         id="weight_kg"
                         v-model="form.weight_kg"
@@ -175,13 +190,15 @@ function submit() {
                 </div>
 
                 <div class="grid gap-2">
-                    <Label for="truck_type_id">Truck type (optional)</Label>
+                    <Label for="truck_type_id">{{
+                        t('Truck type (optional)')
+                    }}</Label>
                     <select
                         id="truck_type_id"
                         v-model="form.truck_type_id"
                         :class="selectClasses"
                     >
-                        <option value="">Any truck</option>
+                        <option value="">{{ t('Any truck') }}</option>
                         <option
                             v-for="type in truckTypes"
                             :key="type.id"
@@ -194,7 +211,9 @@ function submit() {
                 </div>
 
                 <div class="grid gap-2">
-                    <Label for="budget_amount">Budget in HNL (optional)</Label>
+                    <Label for="budget_amount">{{
+                        t('Budget in HNL (optional)')
+                    }}</Label>
                     <Input
                         id="budget_amount"
                         v-model="form.budget_amount"
@@ -208,25 +227,28 @@ function submit() {
             </div>
 
             <div class="grid gap-2">
-                <Label for="special_instructions">
-                    Special instructions (optional)
-                </Label>
+                <Label for="special_instructions">{{
+                    t('Special instructions (optional)')
+                }}</Label>
                 <textarea
                     id="special_instructions"
                     v-model="form.special_instructions"
                     rows="3"
                     :class="selectClasses"
                     class="h-auto"
-                    placeholder="Fragile cargo, needs a forklift at delivery..."
+                    :placeholder="
+                        t('Fragile cargo, needs a forklift at delivery...')
+                    "
                 />
                 <InputError :message="form.errors.special_instructions" />
             </div>
 
             <div class="flex gap-3">
                 <Button type="submit" :disabled="form.processing">
-                    <Spinner v-if="form.processing" />
-                    Save draft
-                </Button>
+                    <Spinner v-if="form.processing" />{{
+                        t('Save draft')
+                    }}</Button
+                >
             </div>
         </form>
     </div>

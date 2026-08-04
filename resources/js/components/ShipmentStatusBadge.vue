@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { Badge } from '@/components/ui/badge';
+import { useTrans } from '@/composables/useTrans';
 
 const props = defineProps<{
     status: string;
@@ -17,6 +18,9 @@ const labels: Record<string, string> = {
     completed: 'Completed',
     cancelled: 'Cancelled',
     expired: 'Expired',
+    pending: 'Pending',
+    rejected: 'Rejected',
+    withdrawn: 'Withdrawn',
 };
 
 const classes: Record<string, string> = {
@@ -38,11 +42,17 @@ const classes: Record<string, string> = {
         'bg-green-100 text-green-800 dark:bg-green-900/40 dark:text-green-300',
     cancelled: 'bg-red-100 text-red-800 dark:bg-red-900/40 dark:text-red-300',
     expired: 'bg-muted text-muted-foreground',
+    pending:
+        'bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-300',
+    rejected: 'bg-red-100 text-red-800 dark:bg-red-900/40 dark:text-red-300',
+    withdrawn: 'bg-muted text-muted-foreground',
 };
+
+const { t } = useTrans();
 </script>
 
 <template>
     <Badge variant="outline" :class="classes[props.status]">
-        {{ labels[props.status] ?? props.status }}
+        {{ t(labels[props.status] ?? props.status) }}
     </Badge>
 </template>

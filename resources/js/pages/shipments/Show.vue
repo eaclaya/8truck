@@ -4,6 +4,7 @@ import InputError from '@/components/InputError.vue';
 import ShipmentStatusBadge from '@/components/ShipmentStatusBadge.vue';
 import { Button } from '@/components/ui/button';
 import { Spinner } from '@/components/ui/spinner';
+import { useTrans } from '@/composables/useTrans';
 import { dashboard } from '@/routes';
 import { accept } from '@/routes/quotes';
 import shipments, { publish } from '@/routes/shipments';
@@ -71,11 +72,13 @@ defineOptions({
 
 const formatMoney = (amount: string, currency: string) =>
     `${currency} ${Number(amount).toLocaleString('es-HN', { minimumFractionDigits: 2 })}`;
+
+const { t } = useTrans();
 </script>
 
 <template>
     <Head
-        :title="`Shipment ${shipment.origin_city} → ${shipment.destination_city}`"
+        :title="`${t('Shipment')} ${shipment.origin_city} → ${shipment.destination_city}`"
     />
 
     <div class="flex h-full flex-1 flex-col gap-4 p-4">
@@ -93,9 +96,10 @@ const formatMoney = (amount: string, currency: string) =>
                 v-slot="{ errors, processing }"
             >
                 <Button type="submit" :disabled="processing">
-                    <Spinner v-if="processing" />
-                    Publish shipment
-                </Button>
+                    <Spinner v-if="processing" />{{
+                        t('Publish shipment')
+                    }}</Button
+                >
                 <InputError :message="errors.shipment" />
             </Form>
         </div>
@@ -104,30 +108,34 @@ const formatMoney = (amount: string, currency: string) =>
             <div
                 class="rounded-xl border border-sidebar-border/70 p-4 lg:col-span-2 dark:border-sidebar-border"
             >
-                <h2 class="mb-3 font-medium">Shipment details</h2>
+                <h2 class="mb-3 font-medium">{{ t('Shipment details') }}</h2>
                 <dl class="grid gap-x-6 gap-y-3 text-sm sm:grid-cols-2">
                     <div>
-                        <dt class="text-muted-foreground">Pickup</dt>
+                        <dt class="text-muted-foreground">{{ t('Pickup') }}</dt>
                         <dd>
                             {{ shipment.origin_address }},
                             {{ shipment.origin_city }}
                         </dd>
                     </div>
                     <div>
-                        <dt class="text-muted-foreground">Delivery</dt>
+                        <dt class="text-muted-foreground">
+                            {{ t('Delivery') }}
+                        </dt>
                         <dd>
                             {{ shipment.destination_address }},
                             {{ shipment.destination_city }}
                         </dd>
                     </div>
                     <div>
-                        <dt class="text-muted-foreground">Pickup date</dt>
+                        <dt class="text-muted-foreground">
+                            {{ t('Pickup date') }}
+                        </dt>
                         <dd>{{ shipment.pickup_date }}</dd>
                     </div>
                     <div>
-                        <dt class="text-muted-foreground">Cargo</dt>
+                        <dt class="text-muted-foreground">{{ t('Cargo') }}</dt>
                         <dd class="capitalize">
-                            {{ shipment.cargo_type }}
+                            {{ t('cargo.' + shipment.cargo_type) }}
                             <span v-if="shipment.weight_kg">
                                 ·
                                 {{ shipment.weight_kg.toLocaleString() }}
@@ -136,11 +144,13 @@ const formatMoney = (amount: string, currency: string) =>
                         </dd>
                     </div>
                     <div>
-                        <dt class="text-muted-foreground">Truck type</dt>
-                        <dd>{{ shipment.truck_type ?? 'Any truck' }}</dd>
+                        <dt class="text-muted-foreground">
+                            {{ t('Truck type') }}
+                        </dt>
+                        <dd>{{ shipment.truck_type ?? t('Any truck') }}</dd>
                     </div>
                     <div>
-                        <dt class="text-muted-foreground">Budget</dt>
+                        <dt class="text-muted-foreground">{{ t('Budget') }}</dt>
                         <dd>
                             {{
                                 shipment.budget_amount
@@ -148,7 +158,7 @@ const formatMoney = (amount: string, currency: string) =>
                                           shipment.budget_amount,
                                           shipment.currency,
                                       )
-                                    : 'Open to offers'
+                                    : t('Open to offers')
                             }}
                         </dd>
                     </div>
@@ -157,7 +167,7 @@ const formatMoney = (amount: string, currency: string) =>
                         class="sm:col-span-2"
                     >
                         <dt class="text-muted-foreground">
-                            Special instructions
+                            {{ t('Special instructions') }}
                         </dt>
                         <dd>{{ shipment.special_instructions }}</dd>
                     </div>
@@ -167,7 +177,7 @@ const formatMoney = (amount: string, currency: string) =>
             <div
                 class="rounded-xl border border-sidebar-border/70 p-4 dark:border-sidebar-border"
             >
-                <h2 class="mb-3 font-medium">History</h2>
+                <h2 class="mb-3 font-medium">{{ t('History') }}</h2>
                 <ol class="space-y-3 text-sm">
                     <li
                         v-for="history in histories"
@@ -180,7 +190,7 @@ const formatMoney = (amount: string, currency: string) =>
                                 v-if="history.actor"
                                 class="text-muted-foreground"
                             >
-                                by {{ history.actor }}
+                                {{ t('by') }} {{ history.actor }}
                             </span>
                         </span>
                         <span class="text-xs text-muted-foreground">
@@ -195,17 +205,23 @@ const formatMoney = (amount: string, currency: string) =>
             class="rounded-xl border border-sidebar-border/70 p-4 dark:border-sidebar-border"
         >
             <h2 class="mb-3 font-medium">
-                Quotes
-                <span class="text-muted-foreground">({{ quotes.length }})</span>
+                {{ t('Quotes')
+                }}<span class="text-muted-foreground"
+                    >({{ quotes.length }})</span
+                >
             </h2>
 
             <p v-if="quotes.length === 0" class="text-sm text-muted-foreground">
-                No quotes yet.
-                <template v-if="shipment.status === 'draft'">
-                    Publish the shipment so transporters can quote it.
-                </template>
+                {{ t('No quotes yet.')
+                }}<template v-if="shipment.status === 'draft'">{{
+                    t('Publish the shipment so transporters can quote it.')
+                }}</template>
                 <template v-else-if="shipment.status === 'published'">
-                    Transporters have been able to see this shipment since
+                    {{
+                        t(
+                            'Transporters have been able to see this shipment since',
+                        )
+                    }}
                     {{ shipment.published_at }}.
                 </template>
             </p>
@@ -233,7 +249,8 @@ const formatMoney = (amount: string, currency: string) =>
                                 >{{ quote.truck }} ·
                             </template>
                             <template v-if="quote.estimated_pickup_at">
-                                pickup {{ quote.estimated_pickup_at }}
+                                {{ t('pickup') }}
+                                {{ quote.estimated_pickup_at }}
                             </template>
                         </span>
                         <span v-if="quote.notes" class="text-muted-foreground">
@@ -261,9 +278,10 @@ const formatMoney = (amount: string, currency: string) =>
                                 size="sm"
                                 :disabled="processing"
                             >
-                                <Spinner v-if="processing" />
-                                Accept quote
-                            </Button>
+                                <Spinner v-if="processing" />{{
+                                    t('Accept quote')
+                                }}</Button
+                            >
                             <InputError :message="errors.quote" />
                         </Form>
                     </div>

@@ -6,6 +6,7 @@ import {
     SidebarMenuButton,
     SidebarMenuItem,
 } from '@/components/ui/sidebar';
+import { useTrans } from '@/composables/useTrans';
 import { toUrl } from '@/lib/utils';
 import type { NavItem } from '@/types';
 
@@ -15,6 +16,8 @@ type Props = {
 };
 
 defineProps<Props>();
+
+const { t } = useTrans();
 </script>
 
 <template>
@@ -34,7 +37,7 @@ defineProps<Props>();
                             rel="noopener noreferrer"
                         >
                             <component :is="item.icon" />
-                            <span>{{ item.title }}</span>
+                            <span>{{ t(item.title) }}</span>
                         </a>
                     </SidebarMenuButton>
                 </SidebarMenuItem>

@@ -3,6 +3,7 @@ import { Form, Head } from '@inertiajs/vue3';
 import TextLink from '@/components/TextLink.vue';
 import { Button } from '@/components/ui/button';
 import { Spinner } from '@/components/ui/spinner';
+import { useTrans } from '@/composables/useTrans';
 import { logout } from '@/routes';
 import { send } from '@/routes/verification';
 
@@ -17,10 +18,12 @@ defineOptions({
 defineProps<{
     status?: string;
 }>();
+
+const { t } = useTrans();
 </script>
 
 <template>
-    <Head title="Email verification" />
+    <Head :title="t('Email verification')" />
 
     <div
         v-if="status === 'verification-link-sent'"
@@ -36,12 +39,13 @@ defineProps<{
         v-slot="{ processing }"
     >
         <Button :disabled="processing" variant="secondary">
-            <Spinner v-if="processing" />
-            Resend verification email
-        </Button>
+            <Spinner v-if="processing" />{{
+                t('Resend verification email')
+            }}</Button
+        >
 
-        <TextLink :href="logout()" as="button" class="mx-auto block text-sm">
-            Log out
-        </TextLink>
+        <TextLink :href="logout()" as="button" class="mx-auto block text-sm">{{
+            t('Log out')
+        }}</TextLink>
     </Form>
 </template>

@@ -8,6 +8,7 @@ import {
     SidebarMenuItem,
 } from '@/components/ui/sidebar';
 import { useCurrentUrl } from '@/composables/useCurrentUrl';
+import { useTrans } from '@/composables/useTrans';
 import type { NavItem } from '@/types';
 
 defineProps<{
@@ -15,6 +16,8 @@ defineProps<{
 }>();
 
 const { isCurrentUrl } = useCurrentUrl();
+
+const { t } = useTrans();
 </script>
 
 <template>
@@ -29,7 +32,7 @@ const { isCurrentUrl } = useCurrentUrl();
                 >
                     <Link :href="item.href">
                         <component :is="item.icon" />
-                        <span>{{ item.title }}</span>
+                        <span>{{ t(item.title) }}</span>
                     </Link>
                 </SidebarMenuButton>
             </SidebarMenuItem>
