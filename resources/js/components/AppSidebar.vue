@@ -5,6 +5,7 @@ import {
     Briefcase,
     FolderGit2,
     LayoutGrid,
+    MapPin,
     Package,
     Search,
     Truck,
@@ -26,6 +27,7 @@ import {
 import { dashboard } from '@/routes';
 import jobs from '@/routes/jobs';
 import loads from '@/routes/loads';
+import regions from '@/routes/regions';
 import shipments from '@/routes/shipments';
 import trucks from '@/routes/trucks';
 import type { NavItem } from '@/types';
@@ -62,6 +64,11 @@ const mainNavItems = computed<NavItem[]>(() => {
                 title: 'Trucks',
                 href: trucks.index(),
                 icon: Truck,
+            },
+            {
+                title: 'Regions',
+                href: regions.index(),
+                icon: MapPin,
             },
         );
     }

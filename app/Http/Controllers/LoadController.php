@@ -42,6 +42,7 @@ class LoadController extends Controller
         return Inertia::render('loads/Index', [
             'loads' => $loads,
             'onlyMyRegions' => $onlyMyRegions,
+            'hasRegions' => $transporter->operatingRegions()->exists(),
         ]);
     }
 

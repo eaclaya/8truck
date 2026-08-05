@@ -5,6 +5,7 @@ use App\Http\Controllers\AdvanceJobStatusController;
 use App\Http\Controllers\CompleteShipmentController;
 use App\Http\Controllers\JobController;
 use App\Http\Controllers\LoadController;
+use App\Http\Controllers\OperatingRegionController;
 use App\Http\Controllers\PublishShipmentController;
 use App\Http\Controllers\RateShipmentController;
 use App\Http\Controllers\ShipmentController;
@@ -31,6 +32,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('jobs', [JobController::class, 'index'])->name('jobs.index');
     Route::post('jobs/{shipment}/advance', AdvanceJobStatusController::class)->name('jobs.advance');
     Route::resource('trucks', TruckController::class)->only(['index', 'create', 'store', 'update', 'destroy']);
+    Route::get('regions', [OperatingRegionController::class, 'index'])->name('regions.index');
+    Route::post('regions', [OperatingRegionController::class, 'store'])->name('regions.store');
+    Route::delete('regions/{operatingRegion}', [OperatingRegionController::class, 'destroy'])->name('regions.destroy');
 });
 
 require __DIR__.'/settings.php';

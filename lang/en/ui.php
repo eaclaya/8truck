@@ -168,4 +168,13 @@ return [
     'National ID' => 'National ID',
     'Insurance' => 'Insurance',
     'Business registration' => 'Business registration',
+    'Regions' => 'Regions',
+    'Operating regions' => 'Operating regions',
+    'Add region' => 'Add region',
+    'City' => 'City',
+    'Radius (km)' => 'Radius (km)',
+    'Save region' => 'Save region',
+    'You have no operating regions yet. Add the cities where you pick up loads.' => 'You have no operating regions yet. Add the cities where you pick up loads.',
+    'Define your operating regions to see loads near you.' => 'Define your operating regions to see loads near you.',
+    'Define regions' => 'Define regions',
 ];

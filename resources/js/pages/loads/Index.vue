@@ -1,9 +1,11 @@
 <script setup lang="ts">
 import { Head, Link } from '@inertiajs/vue3';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { useTrans } from '@/composables/useTrans';
 import { dashboard } from '@/routes';
 import loadRoutes from '@/routes/loads';
+import regionRoutes from '@/routes/regions';
 
 interface LoadRow {
     id: number;
@@ -32,6 +34,7 @@ defineProps<{
         links: PaginationLink[];
     };
     onlyMyRegions: boolean;
+    hasRegions: boolean;
 }>();
 
 defineOptions({
@@ -85,7 +88,21 @@ const cleanLabel = (label: string) =>
             v-if="loads.data.length === 0"
             class="flex flex-1 flex-col items-center justify-center gap-3 rounded-xl border border-dashed border-sidebar-border/70 p-12 text-center dark:border-sidebar-border"
         >
-            <p class="text-muted-foreground">
+            <template v-if="onlyMyRegions && !hasRegions">
+                <p class="text-muted-foreground">
+                    {{
+                        t(
+                            'Define your operating regions to see loads near you.',
+                        )
+                    }}
+                </p>
+                <Button as-child>
+                    <Link :href="regionRoutes.index()">{{
+                        t('Define regions')
+                    }}</Link>
+                </Button>
+            </template>
+            <p v-else class="text-muted-foreground">
                 {{
                     t(
                         'No loads available right now. Check back soon or widen your regions.',
