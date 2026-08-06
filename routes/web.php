@@ -9,6 +9,7 @@ use App\Http\Controllers\GoogleAuthController;
 use App\Http\Controllers\JobController;
 use App\Http\Controllers\LoadController;
 use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\OnboardingController;
 use App\Http\Controllers\OperatingRegionController;
 use App\Http\Controllers\PublishShipmentController;
 use App\Http\Controllers\RateShipmentController;
@@ -29,6 +30,7 @@ Route::middleware('guest')->group(function () {
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('dashboard', DashboardController::class)->name('dashboard');
+    Route::get('onboarding', OnboardingController::class)->name('onboarding');
 
     Route::post('notifications/read-all', [NotificationController::class, 'readAll'])->name('notifications.readAll');
     Route::post('notifications/{id}/read', [NotificationController::class, 'read'])->name('notifications.read');

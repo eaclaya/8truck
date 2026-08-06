@@ -101,6 +101,8 @@ class GoogleAuthController extends Controller
         Auth::login($user, remember: true);
         $request->session()->regenerate();
 
-        return redirect()->intended(route('dashboard'));
+        return redirect()->intended(
+            $user->isTransporter() ? route('onboarding') : route('dashboard'),
+        );
     }
 }

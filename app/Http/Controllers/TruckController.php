@@ -48,7 +48,7 @@ class TruckController extends Controller
 
         $request->user()->transporterProfile->trucks()->create($request->validated());
 
-        return to_route('trucks.index');
+        return $request->boolean('stay') ? back() : to_route('trucks.index');
     }
 
     public function update(UpdateTruckRequest $request, Truck $truck): RedirectResponse
