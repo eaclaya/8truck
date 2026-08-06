@@ -204,4 +204,5 @@ return [
     'Save document' => 'Guardar documento',
     'You have no documents yet. Upload your license and IDs to get verified.' => 'Aún no tienes documentos. Sube tu licencia e identificación para ser verificado.',
     'Uploaded' => 'Subido',
+    'View' => 'Ver',
 ];

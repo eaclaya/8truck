@@ -100,7 +100,12 @@ test('the transporter is notified when their quote is accepted', function () {
 
     app(AcceptQuoteAction::class)->execute($shipment->customer, $quote);
 
-    Notification::assertSentTo($quote->transporterProfile->user, QuoteAcceptedNotification::class);
+    Notification::assertSentTo(
+        $quote->transporterProfile->user,
+        QuoteAcceptedNotification::class,
+        fn ($notification, array $channels): bool => in_array('broadcast', $channels, true)
+            && in_array('database', $channels, true),
+    );
 });
 
 test('the customer is notified when the transporter advances the job', function () {

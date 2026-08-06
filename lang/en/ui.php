@@ -194,4 +194,5 @@ return [
     'Save document' => 'Save document',
     'You have no documents yet. Upload your license and IDs to get verified.' => 'You have no documents yet. Upload your license and IDs to get verified.',
     'Uploaded' => 'Uploaded',
+    'View' => 'View',
 ];
