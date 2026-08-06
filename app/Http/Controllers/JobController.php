@@ -41,6 +41,8 @@ class JobController extends Controller
                 'amount' => $shipment->acceptedQuote?->amount,
                 'currency' => $shipment->currency,
                 'can_rate' => $request->user()->can('rate', $shipment),
+                'can_upload_pod' => $request->user()->can('uploadPod', $shipment),
+                'pod_count' => $shipment->getMedia('pod')->count(),
                 'return_trips' => $this->returnTripsFor($shipment),
             ]);
 

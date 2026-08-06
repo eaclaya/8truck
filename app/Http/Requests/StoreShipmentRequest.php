@@ -23,6 +23,8 @@ class StoreShipmentRequest extends FormRequest
             'truck_type_id' => ['nullable', 'exists:truck_types,id'],
             'budget_amount' => ['nullable', 'numeric', 'min:0', 'max:1000000'],
             'special_instructions' => ['nullable', 'string', 'max:2000'],
+            'photos' => ['nullable', 'array', 'max:5'],
+            'photos.*' => ['image', 'max:5120'],
         ];
     }
 }

@@ -37,6 +37,22 @@ class JobController extends Controller
         return ShipmentResource::collection($jobs);
     }
 
+    public function uploadPod(Request $request, Shipment $shipment): ShipmentResource
+    {
+        Gate::authorize('uploadPod', $shipment);
+
+        $request->validate([
+            'photos' => ['required', 'array', 'min:1', 'max:5'],
+            'photos.*' => ['image', 'max:5120'],
+        ]);
+
+        foreach ($request->file('photos', []) as $photo) {
+            $shipment->addMedia($photo)->toMediaCollection('pod');
+        }
+
+        return new ShipmentResource($shipment->load('media'));
+    }
+
     public function advance(Request $request, Shipment $shipment, TransitionShipmentStatusAction $transition): ShipmentResource
     {
         Gate::authorize('advance', $shipment);

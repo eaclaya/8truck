@@ -14,6 +14,9 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Support\Str;
 use MatanYadaev\EloquentSpatial\Objects\Point;
 use MatanYadaev\EloquentSpatial\Traits\HasSpatial;
+use Spatie\MediaLibrary\HasMedia;
+use Spatie\MediaLibrary\InteractsWithMedia;
+use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
 /**
  * @property int $id
@@ -53,10 +56,10 @@ use MatanYadaev\EloquentSpatial\Traits\HasSpatial;
     'pickup_date', 'cargo_type', 'weight_kg', 'length_cm', 'width_cm', 'height_cm',
     'special_instructions', 'budget_amount', 'currency',
 ])]
-class Shipment extends Model
+class Shipment extends Model implements HasMedia
 {
     /** @use HasFactory<ShipmentFactory> */
-    use HasFactory, HasSpatial;
+    use HasFactory, HasSpatial, InteractsWithMedia;
 
     /**
      * @var array<string, mixed>
@@ -65,6 +68,19 @@ class Shipment extends Model
         'status' => ShipmentStatus::Draft->value,
         'currency' => 'HNL',
     ];
+
+    public function registerMediaCollections(): void
+    {
+        $this->addMediaCollection('cargo');
+        $this->addMediaCollection('pod');
+    }
+
+    public function registerMediaConversions(?Media $media = null): void
+    {
+        $this->addMediaConversion('thumb')
+            ->nonQueued()
+            ->width(400);
+    }
 
     protected static function booted(): void
     {

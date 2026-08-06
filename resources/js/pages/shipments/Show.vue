@@ -44,6 +44,12 @@ interface QuoteRow {
     truck: string | null;
 }
 
+interface Photo {
+    id: number;
+    url: string;
+    thumb: string;
+}
+
 interface RatingRow {
     id: number;
     score: number;
@@ -64,6 +70,8 @@ const props = defineProps<{
     shipment: ShipmentDetail;
     quotes: QuoteRow[];
     histories: HistoryRow[];
+    photos: Photo[];
+    podPhotos: Photo[];
     ratings: RatingRow[];
     can: {
         publish: boolean;
@@ -202,6 +210,44 @@ const { t } = useTrans();
                             {{ t('Special instructions') }}
                         </dt>
                         <dd>{{ shipment.special_instructions }}</dd>
+                    </div>
+                    <div v-if="photos.length > 0" class="sm:col-span-2">
+                        <dt class="mb-1 text-muted-foreground">
+                            {{ t('Photos') }}
+                        </dt>
+                        <dd class="flex flex-wrap gap-2">
+                            <a
+                                v-for="photo in photos"
+                                :key="photo.id"
+                                :href="photo.url"
+                                target="_blank"
+                            >
+                                <img
+                                    :src="photo.thumb"
+                                    class="h-20 w-20 rounded-md border border-sidebar-border/70 object-cover"
+                                    alt=""
+                                />
+                            </a>
+                        </dd>
+                    </div>
+                    <div v-if="podPhotos.length > 0" class="sm:col-span-2">
+                        <dt class="mb-1 text-muted-foreground">
+                            {{ t('Proof of delivery') }}
+                        </dt>
+                        <dd class="flex flex-wrap gap-2">
+                            <a
+                                v-for="photo in podPhotos"
+                                :key="photo.id"
+                                :href="photo.url"
+                                target="_blank"
+                            >
+                                <img
+                                    :src="photo.thumb"
+                                    class="h-20 w-20 rounded-md border border-sidebar-border/70 object-cover"
+                                    alt=""
+                                />
+                            </a>
+                        </dd>
                     </div>
                 </dl>
             </div>

@@ -36,7 +36,19 @@ defineOptions({
     },
 });
 
-const form = useForm({
+const form = useForm<{
+    origin_city_id: string;
+    origin_address: string;
+    destination_city_id: string;
+    destination_address: string;
+    pickup_date: string;
+    cargo_type: string;
+    weight_kg: string;
+    truck_type_id: string;
+    budget_amount: string;
+    special_instructions: string;
+    photos: File[];
+}>({
     origin_city_id: '',
     origin_address: '',
     destination_city_id: '',
@@ -47,7 +59,13 @@ const form = useForm({
     truck_type_id: '',
     budget_amount: '',
     special_instructions: '',
+    photos: [],
 });
+
+function onPhotosSelected(event: Event) {
+    const input = event.target as HTMLInputElement;
+    form.photos = Array.from(input.files ?? []);
+}
 
 const selectClasses =
     'flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-xs transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 dark:bg-input/30';
@@ -224,6 +242,19 @@ const { t } = useTrans();
                     />
                     <InputError :message="form.errors.budget_amount" />
                 </div>
+            </div>
+
+            <div class="grid gap-2">
+                <Label for="photos">{{ t('Cargo photos (optional)') }}</Label>
+                <input
+                    id="photos"
+                    type="file"
+                    multiple
+                    accept="image/*"
+                    class="text-sm text-muted-foreground file:mr-2 file:rounded-md file:border file:border-input file:bg-transparent file:px-2 file:py-1 file:text-sm"
+                    @change="onPhotosSelected"
+                />
+                <InputError :message="form.errors.photos" />
             </div>
 
             <div class="grid gap-2">

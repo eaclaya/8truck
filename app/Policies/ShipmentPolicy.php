@@ -73,6 +73,16 @@ class ShipmentPolicy
     }
 
     /**
+     * The assigned transporter attaches proof of delivery while the cargo
+     * is on the road or just delivered.
+     */
+    public function uploadPod(User $user, Shipment $shipment): bool
+    {
+        return $this->advance($user, $shipment)
+            && in_array($shipment->status, [ShipmentStatus::InTransit, ShipmentStatus::Delivered], true);
+    }
+
+    /**
      * The assigned transporter may advance the delivery status.
      */
     public function advance(User $user, Shipment $shipment): bool

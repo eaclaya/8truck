@@ -61,9 +61,26 @@ class ShipmentController extends Controller
             'quotes' => fn ($query) => $query
                 ->with(['transporterProfile.user:id,name', 'truck.truckType:id,name'])
                 ->orderBy('amount'),
+            'media',
         ]);
 
         return new ShipmentResource($shipment);
+    }
+
+    public function storePhotos(Request $request, Shipment $shipment): ShipmentResource
+    {
+        Gate::authorize('view', $shipment);
+
+        $request->validate([
+            'photos' => ['required', 'array', 'min:1', 'max:5'],
+            'photos.*' => ['image', 'max:5120'],
+        ]);
+
+        foreach ($request->file('photos', []) as $photo) {
+            $shipment->addMedia($photo)->toMediaCollection('cargo');
+        }
+
+        return new ShipmentResource($shipment->load('media'));
     }
 
     public function publish(Request $request, Shipment $shipment, PublishShipmentAction $publishShipment): ShipmentResource

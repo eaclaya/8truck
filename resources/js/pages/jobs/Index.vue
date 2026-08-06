@@ -2,6 +2,7 @@
 import { Form, Head } from '@inertiajs/vue3';
 import { Link } from '@inertiajs/vue3';
 import InputError from '@/components/InputError.vue';
+import PodUploadForm from '@/components/PodUploadForm.vue';
 import RatingForm from '@/components/RatingForm.vue';
 import ShipmentStatusBadge from '@/components/ShipmentStatusBadge.vue';
 import { Button } from '@/components/ui/button';
@@ -32,6 +33,8 @@ interface JobRow {
     amount: string | null;
     currency: string;
     can_rate: boolean;
+    can_upload_pod: boolean;
+    pod_count: number;
     return_trips: ReturnTrip[];
 }
 
@@ -177,6 +180,17 @@ const { t } = useTrans();
                                         >)
                                     </Link>
                                 </template>
+                            </td>
+                        </tr>
+                        <tr
+                            v-if="job.can_upload_pod"
+                            class="border-b border-sidebar-border/40 dark:border-sidebar-border/40"
+                        >
+                            <td colspan="6" class="px-4 py-2">
+                                <PodUploadForm
+                                    :shipment-id="job.id"
+                                    :pod-count="job.pod_count"
+                                />
                             </td>
                         </tr>
                         <tr

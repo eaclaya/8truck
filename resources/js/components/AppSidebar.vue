@@ -3,6 +3,7 @@ import { Link, usePage } from '@inertiajs/vue3';
 import {
     BookOpen,
     Briefcase,
+    FileCheck,
     FolderGit2,
     LayoutGrid,
     MapPin,
@@ -25,6 +26,7 @@ import {
     SidebarMenuItem,
 } from '@/components/ui/sidebar';
 import { dashboard } from '@/routes';
+import documents from '@/routes/documents';
 import jobs from '@/routes/jobs';
 import loads from '@/routes/loads';
 import regions from '@/routes/regions';
@@ -69,6 +71,11 @@ const mainNavItems = computed<NavItem[]>(() => {
                 title: 'Regions',
                 href: regions.index(),
                 icon: MapPin,
+            },
+            {
+                title: 'Documents',
+                href: documents.index(),
+                icon: FileCheck,
             },
         );
     }

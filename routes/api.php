@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\V1\AuthController;
 use App\Http\Controllers\Api\V1\CatalogController;
+use App\Http\Controllers\Api\V1\DocumentController;
 use App\Http\Controllers\Api\V1\JobController;
 use App\Http\Controllers\Api\V1\LoadController;
 use App\Http\Controllers\Api\V1\NotificationController;
@@ -25,6 +26,7 @@ Route::prefix('v1')->name('api.v1.')->group(function () {
         Route::get('shipments', [ShipmentController::class, 'index'])->name('shipments.index');
         Route::post('shipments', [ShipmentController::class, 'store'])->name('shipments.store');
         Route::get('shipments/{shipment}', [ShipmentController::class, 'show'])->name('shipments.show');
+        Route::post('shipments/{shipment}/photos', [ShipmentController::class, 'storePhotos'])->name('shipments.photos');
         Route::post('shipments/{shipment}/publish', [ShipmentController::class, 'publish'])->name('shipments.publish');
         Route::post('shipments/{shipment}/complete', [ShipmentController::class, 'complete'])->name('shipments.complete');
         Route::post('shipments/{shipment}/ratings', [ShipmentController::class, 'rate'])->name('shipments.rate');
@@ -36,11 +38,16 @@ Route::prefix('v1')->name('api.v1.')->group(function () {
 
         Route::get('jobs', [JobController::class, 'index'])->name('jobs.index');
         Route::post('jobs/{shipment}/advance', [JobController::class, 'advance'])->name('jobs.advance');
+        Route::post('jobs/{shipment}/pod', [JobController::class, 'uploadPod'])->name('jobs.pod');
 
         Route::apiResource('trucks', TruckController::class)->only(['index', 'store', 'update', 'destroy']);
         Route::get('regions', [RegionController::class, 'index'])->name('regions.index');
         Route::post('regions', [RegionController::class, 'store'])->name('regions.store');
         Route::delete('regions/{operatingRegion}', [RegionController::class, 'destroy'])->name('regions.destroy');
+
+        Route::get('documents', [DocumentController::class, 'index'])->name('documents.index');
+        Route::post('documents', [DocumentController::class, 'store'])->name('documents.store');
+        Route::get('documents/{document}/download', [DocumentController::class, 'download'])->name('documents.download');
 
         Route::get('notifications', [NotificationController::class, 'index'])->name('notifications.index');
         Route::post('notifications/read-all', [NotificationController::class, 'readAll'])->name('notifications.readAll');

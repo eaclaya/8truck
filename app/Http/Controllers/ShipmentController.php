@@ -67,6 +67,10 @@ class ShipmentController extends Controller
             'destination' => $destinationCity->location,
         ]);
 
+        foreach ($request->file('photos', []) as $photo) {
+            $shipment->addMedia($photo)->toMediaCollection('cargo');
+        }
+
         return to_route('shipments.show', $shipment);
     }
 
@@ -126,6 +130,16 @@ class ShipmentController extends Controller
                 'notes' => $history->notes,
                 'created_at' => $history->created_at?->toDateTimeString(),
             ]),
+            'photos' => $shipment->getMedia('cargo')->map(fn ($media) => [
+                'id' => $media->id,
+                'url' => $media->getUrl(),
+                'thumb' => $media->getUrl('thumb'),
+            ])->values(),
+            'podPhotos' => $shipment->getMedia('pod')->map(fn ($media) => [
+                'id' => $media->id,
+                'url' => $media->getUrl(),
+                'thumb' => $media->getUrl('thumb'),
+            ])->values(),
             'ratings' => $shipment->ratings->map(fn ($rating) => [
                 'id' => $rating->id,
                 'score' => $rating->score,

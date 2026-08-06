@@ -51,6 +51,11 @@ class DocumentResource extends Resource
                     ->options(DocumentStatus::class),
             ])
             ->recordActions([
+                Action::make('open')
+                    ->icon(Heroicon::Eye)
+                    ->color('gray')
+                    ->url(fn (Document $record): string => route('documents.download', $record))
+                    ->openUrlInNewTab(),
                 Action::make('approve')
                     ->icon(Heroicon::CheckCircle)
                     ->color('success')
