@@ -31,7 +31,7 @@ if (userId) {
                     : undefined,
             });
 
-            router.reload({ only: ['notifications'] });
+            router.reload();
         },
     );
 }

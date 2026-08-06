@@ -3,6 +3,7 @@
 use App\Http\Controllers\AcceptQuoteController;
 use App\Http\Controllers\AdvanceJobStatusController;
 use App\Http\Controllers\CompleteShipmentController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DocumentController;
 use App\Http\Controllers\JobController;
 use App\Http\Controllers\LoadController;
@@ -19,7 +20,7 @@ use Illuminate\Support\Facades\Route;
 Route::inertia('/', 'Welcome')->name('home');
 
 Route::middleware(['auth', 'verified'])->group(function () {
-    Route::inertia('dashboard', 'Dashboard')->name('dashboard');
+    Route::get('dashboard', DashboardController::class)->name('dashboard');
 
     Route::post('notifications/read-all', [NotificationController::class, 'readAll'])->name('notifications.readAll');
     Route::post('notifications/{id}/read', [NotificationController::class, 'read'])->name('notifications.read');
