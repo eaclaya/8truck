@@ -12,12 +12,27 @@ const props = defineProps<ToasterProps>()
 <template>
   <Sonner
     :class="cn('toaster group', props.class)"
+    :duration="5000"
+    rich-colors
     :style="{
-      // Inverted on purpose: dark toast on the light theme and vice versa,
-      // so notifications stand out from the page instead of blending in.
-      '--normal-bg': 'var(--foreground)',
-      '--normal-text': 'var(--background)',
-      '--normal-border': 'var(--foreground)',
+      // Solid, saturated palette so toasts stand out in both themes:
+      // blue for default/info, green for success, red for error,
+      // orange for warning. White text throughout.
+      '--normal-bg': '#2563eb',
+      '--normal-text': '#ffffff',
+      '--normal-border': '#2563eb',
+      '--info-bg': '#2563eb',
+      '--info-text': '#ffffff',
+      '--info-border': '#2563eb',
+      '--success-bg': '#16a34a',
+      '--success-text': '#ffffff',
+      '--success-border': '#16a34a',
+      '--error-bg': '#dc2626',
+      '--error-text': '#ffffff',
+      '--error-border': '#dc2626',
+      '--warning-bg': '#ea580c',
+      '--warning-text': '#ffffff',
+      '--warning-border': '#ea580c',
       '--border-radius': 'var(--radius)',
     }"
     v-bind="props"
