@@ -11,6 +11,7 @@ import {
     CardHeader,
     CardTitle,
 } from '@/components/ui/card';
+import { useTrans } from '@/composables/useTrans';
 import { useTwoFactorAuth } from '@/composables/useTwoFactorAuth';
 import { regenerateRecoveryCodes } from '@/routes/two-factor';
 
@@ -36,6 +37,8 @@ onMounted(async () => {
         await fetchRecoveryCodes();
     }
 });
+
+const { t } = useTrans();
 </script>
 
 <template>
@@ -75,8 +78,8 @@ onMounted(async () => {
                         type="submit"
                         :disabled="processing"
                     >
-                        <RefreshCw /> Regenerate codes
-                    </Button>
+                        <RefreshCw />{{ t('Regenerate codes') }}</Button
+                    >
                 </Form>
             </div>
             <div
@@ -114,7 +117,10 @@ onMounted(async () => {
                         Each recovery code can be used once to access your
                         account and will be removed after use. If you need more,
                         click
-                        <span class="font-bold">Regenerate codes</span> above.
+                        <span class="font-bold">{{
+                            t('Regenerate codes')
+                        }}</span>
+                        above.
                     </p>
                 </div>
             </div>

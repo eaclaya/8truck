@@ -4,6 +4,7 @@ import Heading from '@/components/Heading.vue';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { useCurrentUrl } from '@/composables/useCurrentUrl';
+import { useTrans } from '@/composables/useTrans';
 import { toUrl } from '@/lib/utils';
 import { edit as editAppearance } from '@/routes/appearance';
 import { edit as editProfile } from '@/routes/profile';
@@ -26,6 +27,8 @@ const sidebarNavItems: NavItem[] = [
 ];
 
 const { isCurrentOrParentUrl } = useCurrentUrl();
+
+const { t } = useTrans();
 </script>
 
 <template>
@@ -53,7 +56,7 @@ const { isCurrentOrParentUrl } = useCurrentUrl();
                     >
                         <Link :href="item.href">
                             <component :is="item.icon" class="h-4 w-4" />
-                            {{ item.title }}
+                            {{ t(item.title) }}
                         </Link>
                     </Button>
                 </nav>

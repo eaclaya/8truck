@@ -20,6 +20,7 @@ import {
 } from '@/components/ui/input-otp';
 import { Spinner } from '@/components/ui/spinner';
 import { useAppearance } from '@/composables/useAppearance';
+import { useTrans } from '@/composables/useTrans';
 import { useTwoFactorAuth } from '@/composables/useTwoFactorAuth';
 import { confirm } from '@/routes/two-factor';
 import type { TwoFactorConfigContent } from '@/types';
@@ -46,26 +47,30 @@ const pinInputContainerRef = useTemplateRef('pinInputContainerRef');
 const modalConfig = computed<TwoFactorConfigContent>(() => {
     if (props.twoFactorEnabled) {
         return {
-            title: 'Two-factor authentication enabled',
-            description:
+            title: t('Two-factor authentication enabled'),
+            description: t(
                 'Two-factor authentication is now enabled. Scan the QR code or enter the setup key in your authenticator app.',
-            buttonText: 'Close',
+            ),
+            buttonText: t('Close'),
         };
     }
 
     if (showVerificationStep.value) {
         return {
-            title: 'Verify authentication code',
-            description: 'Enter the 6-digit code from your authenticator app',
-            buttonText: 'Continue',
+            title: t('Verify authentication code'),
+            description: t(
+                'Enter the 6-digit code from your authenticator app',
+            ),
+            buttonText: t('Continue'),
         };
     }
 
     return {
-        title: 'Enable two-factor authentication',
-        description:
+        title: t('Enable two-factor authentication'),
+        description: t(
             'To finish enabling two-factor authentication, scan the QR code or enter the setup key in your authenticator app',
-        buttonText: 'Continue',
+        ),
+        buttonText: t('Continue'),
     };
 });
 
@@ -107,6 +112,8 @@ watch(
         }
     },
 );
+
+const { t } = useTrans();
 </script>
 
 <template>
@@ -278,16 +285,14 @@ watch(
                                     class="w-auto flex-1"
                                     @click="showVerificationStep = false"
                                     :disabled="processing"
+                                    >{{ t('Back') }}</Button
                                 >
-                                    Back
-                                </Button>
                                 <Button
                                     type="submit"
                                     class="w-auto flex-1"
                                     :disabled="processing || code.length < 6"
+                                    >{{ t('Confirm') }}</Button
                                 >
-                                    Confirm
-                                </Button>
                             </div>
                         </div>
                     </Form>
