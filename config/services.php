@@ -37,6 +37,11 @@ return [
 
     'google' => [
         'client_id' => env('GOOGLE_CLIENT_ID'),
+        'client_secret' => env('GOOGLE_CLIENT_SECRET'),
+        // Relative so the callback host follows the request (8truck.test,
+        // the expose tunnel, or production) - Google must whitelist the
+        // exact absolute URI you test with.
+        'redirect' => env('GOOGLE_REDIRECT_URI', '/auth/google/callback'),
     ],
 
     'fcm' => [

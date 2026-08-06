@@ -2,6 +2,7 @@
 import { Form, Head } from '@inertiajs/vue3';
 import { Package, Truck } from '@lucide/vue';
 import { ref } from 'vue';
+import GoogleButton from '@/components/GoogleButton.vue';
 import InputError from '@/components/InputError.vue';
 import PasswordInput from '@/components/PasswordInput.vue';
 import TextLink from '@/components/TextLink.vue';
@@ -164,6 +165,8 @@ const { t } = useTrans();
                 <Spinner v-if="processing" />{{ t('Create account') }}</Button
             >
         </div>
+
+        <GoogleButton />
 
         <div class="text-center text-sm text-muted-foreground">
             {{ t('Already have an account?')

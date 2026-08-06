@@ -249,4 +249,8 @@ return [
     'Close' => 'Close',
     'Confirm' => 'Confirm',
     'Regenerate codes' => 'Regenerate codes',
+    'or' => 'or',
+    'Continue with Google' => 'Continue with Google',
+    'Complete your account' => 'Complete your account',
+    'Tell us how you will use the platform' => 'Tell us how you will use the platform',
 ];

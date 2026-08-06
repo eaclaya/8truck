@@ -5,6 +5,7 @@ use App\Http\Controllers\AdvanceJobStatusController;
 use App\Http\Controllers\CompleteShipmentController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DocumentController;
+use App\Http\Controllers\GoogleAuthController;
 use App\Http\Controllers\JobController;
 use App\Http\Controllers\LoadController;
 use App\Http\Controllers\NotificationController;
@@ -18,6 +19,13 @@ use App\Http\Controllers\UploadProofOfDeliveryController;
 use Illuminate\Support\Facades\Route;
 
 Route::inertia('/', 'Welcome')->name('home');
+
+Route::middleware('guest')->group(function () {
+    Route::get('auth/google/redirect', [GoogleAuthController::class, 'redirect'])->name('google.redirect');
+    Route::get('auth/google/callback', [GoogleAuthController::class, 'callback'])->name('google.callback');
+    Route::get('auth/google/complete', [GoogleAuthController::class, 'complete'])->name('google.complete');
+    Route::post('auth/google/complete', [GoogleAuthController::class, 'store'])->name('google.store');
+});
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('dashboard', DashboardController::class)->name('dashboard');

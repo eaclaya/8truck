@@ -261,4 +261,8 @@ return [
     'Close' => 'Cerrar',
     'Confirm' => 'Confirmar',
     'Regenerate codes' => 'Regenerar códigos',
+    'or' => 'o',
+    'Continue with Google' => 'Continuar con Google',
+    'Complete your account' => 'Completa tu cuenta',
+    'Tell us how you will use the platform' => 'Cuéntanos cómo usarás la plataforma',
 ];
