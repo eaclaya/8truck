@@ -13,9 +13,11 @@ const props = defineProps<ToasterProps>()
   <Sonner
     :class="cn('toaster group', props.class)"
     :style="{
-      '--normal-bg': 'var(--popover)',
-      '--normal-text': 'var(--popover-foreground)',
-      '--normal-border': 'var(--border)',
+      // Inverted on purpose: dark toast on the light theme and vice versa,
+      // so notifications stand out from the page instead of blending in.
+      '--normal-bg': 'var(--foreground)',
+      '--normal-text': 'var(--background)',
+      '--normal-border': 'var(--foreground)',
       '--border-radius': 'var(--radius)',
     }"
     v-bind="props"
