@@ -92,6 +92,23 @@ class Shipment extends Model
     }
 
     /**
+     * Human-readable origin: city name when set, street address otherwise.
+     */
+    public function originLabel(): string
+    {
+        $city = $this->getRelationValue('originCity');
+
+        return $city instanceof City ? $city->name : $this->origin_address;
+    }
+
+    public function destinationLabel(): string
+    {
+        $city = $this->getRelationValue('destinationCity');
+
+        return $city instanceof City ? $city->name : $this->destination_address;
+    }
+
+    /**
      * @return BelongsTo<User, $this>
      */
     public function customer(): BelongsTo

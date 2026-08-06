@@ -177,4 +177,7 @@ return [
     'You have no operating regions yet. Add the cities where you pick up loads.' => 'You have no operating regions yet. Add the cities where you pick up loads.',
     'Define your operating regions to see loads near you.' => 'Define your operating regions to see loads near you.',
     'Define regions' => 'Define regions',
+    'Notifications' => 'Notifications',
+    'Mark all as read' => 'Mark all as read',
+    'No notifications yet.' => 'No notifications yet.',
 ];

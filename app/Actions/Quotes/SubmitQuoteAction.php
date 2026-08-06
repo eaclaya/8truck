@@ -5,6 +5,7 @@ namespace App\Actions\Quotes;
 use App\Actions\Shipments\TransitionShipmentStatusAction;
 use App\Enums\QuoteStatus;
 use App\Enums\ShipmentStatus;
+use App\Events\QuoteSubmitted;
 use App\Exceptions\ShipmentException;
 use App\Models\Quote;
 use App\Models\Shipment;
@@ -27,7 +28,7 @@ class SubmitQuoteAction
             throw ShipmentException::ownShipment();
         }
 
-        return DB::transaction(function () use ($transporter, $shipment, $data) {
+        $quote = DB::transaction(function () use ($transporter, $shipment, $data) {
             $shipment = Shipment::query()->whereKey($shipment->id)->lockForUpdate()->firstOrFail();
 
             if (! $shipment->status->isOpenForQuotes()) {
@@ -55,5 +56,9 @@ class SubmitQuoteAction
 
             return $quote;
         });
+
+        QuoteSubmitted::dispatch($quote);
+
+        return $quote;
     }
 }

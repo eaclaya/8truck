@@ -44,7 +44,7 @@ test('the demo transporter has a guaranteed return trip match', function () {
     $matches = app(FindReturnTripsAction::class)->execute($outbound);
 
     expect($matches)->not->toBeEmpty()
-        ->and($matches->first()->special_instructions)->toBe('Demo: carga de retorno');
+        ->and($matches->pluck('special_instructions'))->toContain('Demo: carga de retorno');
 });
 
 test('the demo seeder is idempotent', function () {

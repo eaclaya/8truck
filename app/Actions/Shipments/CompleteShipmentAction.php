@@ -3,6 +3,7 @@
 namespace App\Actions\Shipments;
 
 use App\Enums\ShipmentStatus;
+use App\Events\ShipmentCompleted;
 use App\Models\Shipment;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
@@ -17,7 +18,7 @@ class CompleteShipmentAction
      */
     public function execute(Shipment $shipment, ?User $actor = null): Shipment
     {
-        return DB::transaction(function () use ($shipment, $actor) {
+        $shipment = DB::transaction(function () use ($shipment, $actor) {
             $shipment->completed_at = now();
 
             $this->transition->execute($shipment, ShipmentStatus::Completed, $actor);
@@ -38,5 +39,9 @@ class CompleteShipmentAction
 
             return $shipment;
         });
+
+        ShipmentCompleted::dispatch($shipment);
+
+        return $shipment;
     }
 }

@@ -3,6 +3,7 @@
 namespace App\Actions\Ratings;
 
 use App\Enums\ShipmentStatus;
+use App\Events\ShipmentRated;
 use App\Exceptions\ShipmentException;
 use App\Models\Rating;
 use App\Models\Shipment;
@@ -24,7 +25,7 @@ class RateShipmentAction
 
         $ratee = $this->rateeFor($rater, $shipment);
 
-        return DB::transaction(function () use ($rater, $ratee, $shipment, $score, $comment) {
+        $rating = DB::transaction(function () use ($rater, $ratee, $shipment, $score, $comment) {
             $alreadyRated = $shipment->ratings()
                 ->where('rater_id', $rater->id)
                 ->exists();
@@ -44,6 +45,10 @@ class RateShipmentAction
 
             return $rating;
         });
+
+        ShipmentRated::dispatch($rating);
+
+        return $rating;
     }
 
     private function rateeFor(User $rater, Shipment $shipment): User

@@ -43,6 +43,17 @@ class HandleInertiaRequests extends Middleware
                 'isTransporter' => $request->user()?->transporterProfile !== null,
             ],
             'locale' => app()->getLocale(),
+            'notifications' => fn (): ?array => $request->user() === null ? null : [
+                'unread' => $request->user()->unreadNotifications()->count(),
+                'items' => $request->user()->notifications()->latest()->limit(10)->get()
+                    ->map(fn ($notification) => [
+                        'id' => $notification->id,
+                        'title' => $notification->data['title'] ?? '',
+                        'body' => $notification->data['body'] ?? '',
+                        'read' => $notification->read_at !== null,
+                        'created_at' => $notification->created_at?->diffForHumans(),
+                    ])->all(),
+            ],
             'translations' => fn (): array => trans('ui'),
             'sidebarOpen' => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
         ];

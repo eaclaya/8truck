@@ -5,6 +5,7 @@ use App\Http\Controllers\AdvanceJobStatusController;
 use App\Http\Controllers\CompleteShipmentController;
 use App\Http\Controllers\JobController;
 use App\Http\Controllers\LoadController;
+use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\OperatingRegionController;
 use App\Http\Controllers\PublishShipmentController;
 use App\Http\Controllers\RateShipmentController;
@@ -17,6 +18,9 @@ Route::inertia('/', 'Welcome')->name('home');
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::inertia('dashboard', 'Dashboard')->name('dashboard');
+
+    Route::post('notifications/read-all', [NotificationController::class, 'readAll'])->name('notifications.readAll');
+    Route::post('notifications/{id}/read', [NotificationController::class, 'read'])->name('notifications.read');
 
     // Customer
     Route::resource('shipments', ShipmentController::class)->only(['index', 'create', 'store', 'show']);

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Actions\Shipments\TransitionShipmentStatusAction;
 use App\Enums\ShipmentStatus;
+use App\Events\ShipmentStatusAdvanced;
 use App\Exceptions\ShipmentException;
 use App\Models\Shipment;
 use Illuminate\Http\RedirectResponse;
@@ -43,6 +44,8 @@ class AdvanceJobStatusController extends Controller
             $shipment->delivered_at = now();
             $shipment->save();
         }
+
+        ShipmentStatusAdvanced::dispatch($shipment);
 
         return back();
     }

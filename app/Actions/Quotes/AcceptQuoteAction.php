@@ -5,6 +5,7 @@ namespace App\Actions\Quotes;
 use App\Actions\Shipments\TransitionShipmentStatusAction;
 use App\Enums\QuoteStatus;
 use App\Enums\ShipmentStatus;
+use App\Events\QuoteAccepted;
 use App\Exceptions\ShipmentException;
 use App\Models\Quote;
 use App\Models\Shipment;
@@ -22,7 +23,7 @@ class AcceptQuoteAction
      */
     public function execute(User $customer, Quote $quote): Shipment
     {
-        return DB::transaction(function () use ($customer, $quote) {
+        $shipment = DB::transaction(function () use ($customer, $quote) {
             $shipment = Shipment::query()->whereKey($quote->shipment_id)->lockForUpdate()->firstOrFail();
 
             if ($shipment->customer_id !== $customer->id) {
@@ -54,5 +55,9 @@ class AcceptQuoteAction
 
             return $shipment;
         });
+
+        QuoteAccepted::dispatch($quote);
+
+        return $shipment;
     }
 }

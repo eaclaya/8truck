@@ -3,6 +3,7 @@
 namespace App\Actions\Shipments;
 
 use App\Enums\ShipmentStatus;
+use App\Events\ShipmentPublished;
 use App\Models\Shipment;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
@@ -17,11 +18,15 @@ class PublishShipmentAction
      */
     public function execute(Shipment $shipment, ?User $actor = null): Shipment
     {
-        return DB::transaction(function () use ($shipment, $actor) {
+        $shipment = DB::transaction(function () use ($shipment, $actor) {
             $shipment->published_at = now();
             $shipment->expires_at = $shipment->pickup_date->endOfDay();
 
             return $this->transition->execute($shipment, ShipmentStatus::Published, $actor);
         });
+
+        ShipmentPublished::dispatch($shipment);
+
+        return $shipment;
     }
 }

@@ -187,4 +187,7 @@ return [
     'You have no operating regions yet. Add the cities where you pick up loads.' => 'Aún no tienes regiones de operación. Agrega las ciudades donde recoges cargas.',
     'Define your operating regions to see loads near you.' => 'Define tus regiones de operación para ver cargas cerca de ti.',
     'Define regions' => 'Definir regiones',
+    'Notifications' => 'Notificaciones',
+    'Mark all as read' => 'Marcar todas como leídas',
+    'No notifications yet.' => 'Aún no tienes notificaciones.',
 ];
