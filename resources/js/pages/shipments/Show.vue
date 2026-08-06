@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { Form, Head } from '@inertiajs/vue3';
+import { Form, Head, router } from '@inertiajs/vue3';
+import { useEcho } from '@laravel/echo-vue';
 import InputError from '@/components/InputError.vue';
 import RatingForm from '@/components/RatingForm.vue';
 import ShipmentStatusBadge from '@/components/ShipmentStatusBadge.vue';
@@ -59,7 +60,7 @@ interface HistoryRow {
     created_at: string | null;
 }
 
-defineProps<{
+const props = defineProps<{
     shipment: ShipmentDetail;
     quotes: QuoteRow[];
     histories: HistoryRow[];
@@ -80,6 +81,14 @@ defineOptions({
         ],
     },
 });
+
+useEcho(
+    `shipments.${props.shipment.id}`,
+    ['QuoteSubmitted', 'QuoteAccepted', 'ShipmentStatusAdvanced'],
+    () => {
+        router.reload({ only: ['shipment', 'quotes', 'histories', 'can'] });
+    },
+);
 
 const formatMoney = (amount: string, currency: string) =>
     `${currency} ${Number(amount).toLocaleString('es-HN', { minimumFractionDigits: 2 })}`;
