@@ -39,4 +39,10 @@ return [
         'client_id' => env('GOOGLE_CLIENT_ID'),
     ],
 
+    'fcm' => [
+        // Requires a Firebase project: set FIREBASE_CREDENTIALS to the
+        // service account JSON path, then enable.
+        'enabled' => env('FCM_ENABLED', false),
+    ],
+
 ];

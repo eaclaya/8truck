@@ -3,6 +3,7 @@
 namespace App\Notifications;
 
 use App\Models\Rating;
+use App\Notifications\Concerns\SendsFcmPush;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
@@ -10,7 +11,7 @@ use Illuminate\Notifications\Notification;
 
 class RatingReceived extends Notification implements ShouldQueue
 {
-    use Queueable;
+    use Queueable, SendsFcmPush;
 
     public function __construct(public Rating $rating)
     {
@@ -22,7 +23,7 @@ class RatingReceived extends Notification implements ShouldQueue
      */
     public function via(object $notifiable): array
     {
-        return ['database', 'broadcast', 'mail'];
+        return $this->channels();
     }
 
     public function toMail(object $notifiable): MailMessage

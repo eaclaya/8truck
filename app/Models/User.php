@@ -63,6 +63,16 @@ class User extends Authenticatable implements FilamentUser
     }
 
     /**
+     * FCM tokens for this user's registered mobile devices.
+     *
+     * @return array<int, string>
+     */
+    public function routeNotificationForFcm(): array
+    {
+        return $this->deviceTokens()->pluck('token')->all();
+    }
+
+    /**
      * @return HasOne<Company, $this>
      */
     public function company(): HasOne
@@ -84,6 +94,14 @@ class User extends Authenticatable implements FilamentUser
     public function shipments(): HasMany
     {
         return $this->hasMany(Shipment::class, 'customer_id');
+    }
+
+    /**
+     * @return HasMany<DeviceToken, $this>
+     */
+    public function deviceTokens(): HasMany
+    {
+        return $this->hasMany(DeviceToken::class);
     }
 
     /**

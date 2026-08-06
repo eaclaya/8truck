@@ -2,10 +2,13 @@
 
 use App\Http\Controllers\Api\V1\AuthController;
 use App\Http\Controllers\Api\V1\CatalogController;
+use App\Http\Controllers\Api\V1\DashboardController;
+use App\Http\Controllers\Api\V1\DeviceTokenController;
 use App\Http\Controllers\Api\V1\DocumentController;
 use App\Http\Controllers\Api\V1\JobController;
 use App\Http\Controllers\Api\V1\LoadController;
 use App\Http\Controllers\Api\V1\NotificationController;
+use App\Http\Controllers\Api\V1\ProfileController;
 use App\Http\Controllers\Api\V1\RegionController;
 use App\Http\Controllers\Api\V1\ShipmentController;
 use App\Http\Controllers\Api\V1\TruckController;
@@ -19,6 +22,12 @@ Route::prefix('v1')->name('api.v1.')->group(function () {
     Route::middleware('auth:sanctum')->group(function () {
         Route::get('auth/me', [AuthController::class, 'me'])->name('auth.me');
         Route::post('auth/logout', [AuthController::class, 'logout'])->name('auth.logout');
+
+        Route::get('dashboard', DashboardController::class)->name('dashboard');
+        Route::patch('profile', [ProfileController::class, 'update'])->name('profile.update');
+        Route::put('password', [ProfileController::class, 'updatePassword'])->name('password.update');
+        Route::post('devices', [DeviceTokenController::class, 'store'])->name('devices.store');
+        Route::delete('devices', [DeviceTokenController::class, 'destroy'])->name('devices.destroy');
 
         Route::get('cities', [CatalogController::class, 'cities'])->name('cities');
         Route::get('truck-types', [CatalogController::class, 'truckTypes'])->name('truck-types');

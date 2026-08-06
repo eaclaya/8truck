@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api\V1;
 
+use App\Actions\Shipments\FindReturnTripsAction;
 use App\Actions\Shipments\TransitionShipmentStatusAction;
 use App\Enums\ShipmentStatus;
 use App\Events\ShipmentStatusAdvanced;
@@ -22,7 +23,7 @@ class JobController extends Controller
         ShipmentStatus::Delivered,
     ];
 
-    public function index(Request $request): AnonymousResourceCollection
+    public function index(Request $request, FindReturnTripsAction $findReturnTrips): AnonymousResourceCollection
     {
         $transporter = $request->user()->transporterProfile;
 
@@ -33,6 +34,10 @@ class JobController extends Controller
             ->with(['originCity:id,name', 'destinationCity:id,name', 'customer:id,name'])
             ->orderByRaw("status = 'completed', pickup_date")
             ->paginate(15);
+
+        $jobs->getCollection()->each(function (Shipment $shipment) use ($findReturnTrips) {
+            $shipment->setAttribute('return_trips', $findReturnTrips->summaryFor($shipment));
+        });
 
         return ShipmentResource::collection($jobs);
     }

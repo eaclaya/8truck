@@ -43,46 +43,12 @@ class JobController extends Controller
                 'can_rate' => $request->user()->can('rate', $shipment),
                 'can_upload_pod' => $request->user()->can('uploadPod', $shipment),
                 'pod_count' => $shipment->getMedia('pod')->count(),
-                'return_trips' => $this->returnTripsFor($shipment),
+                'return_trips' => $this->findReturnTrips->summaryFor($shipment),
             ]);
 
         return Inertia::render('jobs/Index', [
             'jobs' => $jobs,
         ]);
-    }
-
-    /**
-     * Up to three open reverse-route loads for an active job, so the truck
-     * does not drive back empty.
-     *
-     * @return array<int, array<string, mixed>>
-     */
-    private function returnTripsFor(Shipment $shipment): array
-    {
-        $activeStatuses = [
-            ShipmentStatus::Accepted,
-            ShipmentStatus::DriverAssigned,
-            ShipmentStatus::PickedUp,
-            ShipmentStatus::InTransit,
-        ];
-
-        if (! in_array($shipment->status, $activeStatuses, true)) {
-            return [];
-        }
-
-        return $this->findReturnTrips->execute($shipment)
-            ->take(3)
-            ->load(['originCity:id,name', 'destinationCity:id,name'])
-            ->map(fn (Shipment $trip) => [
-                'id' => $trip->id,
-                'origin_city' => $trip->originCity?->name,
-                'destination_city' => $trip->destinationCity?->name,
-                'pickup_date' => $trip->pickup_date->toDateString(),
-                'budget_amount' => $trip->budget_amount,
-                'currency' => $trip->currency,
-            ])
-            ->values()
-            ->all();
     }
 
     /**

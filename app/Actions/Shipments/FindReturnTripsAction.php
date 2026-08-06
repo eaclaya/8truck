@@ -38,6 +38,39 @@ class FindReturnTripsAction
             ->get();
     }
 
+    /**
+     * Compact payload of up to $limit return trips for a job row.
+     *
+     * @return array<int, array<string, mixed>>
+     */
+    public function summaryFor(Shipment $shipment, int $limit = 3): array
+    {
+        $activeStatuses = [
+            ShipmentStatus::Accepted,
+            ShipmentStatus::DriverAssigned,
+            ShipmentStatus::PickedUp,
+            ShipmentStatus::InTransit,
+        ];
+
+        if (! in_array($shipment->status, $activeStatuses, true)) {
+            return [];
+        }
+
+        return $this->execute($shipment)
+            ->take($limit)
+            ->load(['originCity:id,name', 'destinationCity:id,name'])
+            ->map(fn (Shipment $trip) => [
+                'id' => $trip->id,
+                'origin_city' => $trip->originLabel(),
+                'destination_city' => $trip->destinationLabel(),
+                'pickup_date' => $trip->pickup_date->toDateString(),
+                'budget_amount' => $trip->budget_amount,
+                'currency' => $trip->currency,
+            ])
+            ->values()
+            ->all();
+    }
+
     private function ewkt(Point $point): string
     {
         return sprintf('SRID=4326;POINT(%s %s)', $point->longitude, $point->latitude);
