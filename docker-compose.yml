@@ -28,6 +28,45 @@ services:
       interval: 5s
       retries: 10
 
+  horizon:
+    build: ./docker/php
+    container_name: 8truck-horizon
+    command: php artisan horizon
+    volumes:
+      - .:/var/www/html
+    env_file: .env
+    environment:
+      DB_HOST: pgsql
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      REVERB_HOST: reverb
+    depends_on:
+      pgsql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+
+  reverb:
+    build: ./docker/php
+    container_name: 8truck-reverb
+    command: php artisan reverb:start --host=0.0.0.0 --port=8080
+    volumes:
+      - .:/var/www/html
+    env_file: .env
+    environment:
+      DB_HOST: pgsql
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+    ports:
+      - '8080:8080'
+    depends_on:
+      pgsql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+
 volumes:
   pgsql-data:
   redis-data:

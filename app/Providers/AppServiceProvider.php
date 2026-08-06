@@ -34,7 +34,9 @@ class AppServiceProvider extends ServiceProvider
     {
         Date::use(CarbonImmutable::class);
 
-        DevCommands::artisan('horizon', 'queue');
+        // Horizon and Reverb run as Docker services (docker-compose.yml),
+        // so the dev command should not start local copies of them.
+        DevCommands::except('queue', 'reverb');
 
         DB::prohibitDestructiveCommands(
             app()->isProduction(),
