@@ -83,7 +83,7 @@ test('completing as transporter requires a phone and creates the profile', funct
     $this->post(route('google.store'), [
         'role' => 'transporter',
         'phone' => '+504 9999-0000',
-    ])->assertRedirect(route('dashboard'));
+    ])->assertRedirect(route('onboarding'));
 
     $user = User::query()->where('email', 'trans-sso@example.com')->firstOrFail();
 

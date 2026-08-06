@@ -44,7 +44,7 @@ test('new transporters register with a phone and get a profile', function () {
     ]);
 
     $this->assertAuthenticated();
-    $response->assertRedirect(route('dashboard', absolute: false));
+    $response->assertRedirect(route('onboarding', absolute: false));
 
     $user = User::query()->where('email', 'trucker@example.com')->firstOrFail();
 
