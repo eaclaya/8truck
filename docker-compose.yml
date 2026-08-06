@@ -47,6 +47,25 @@ services:
         condition: service_healthy
     restart: unless-stopped
 
+  scheduler:
+    build: ./docker/php
+    container_name: 8truck-scheduler
+    command: php artisan schedule:work
+    volumes:
+      - .:/var/www/html
+    env_file: .env
+    environment:
+      DB_HOST: pgsql
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      REVERB_HOST: reverb
+    depends_on:
+      pgsql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+
   reverb:
     build: ./docker/php
     container_name: 8truck-reverb
