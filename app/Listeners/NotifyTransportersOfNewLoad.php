@@ -15,8 +15,10 @@ class NotifyTransportersOfNewLoad implements ShouldQueue
     public string $queue = 'notifications';
 
     /**
-     * Fan out to transporters whose operating regions cover the origin and
-     * whose fleet matches the requested truck type (when one is set).
+     * Fan out to transporters whose operating regions cover the origin.
+     * When the shipment requests a truck type, transporters who own trucks
+     * are filtered to matching fleets - but truck-less (onboarding)
+     * transporters still hear about every load in their regions.
      */
     public function handle(ShipmentPublished $event): void
     {
@@ -33,9 +35,11 @@ class NotifyTransportersOfNewLoad implements ShouldQueue
             ->whereHas('operatingRegions', fn ($regions) => $regions
                 ->whereRaw('ST_DWithin(center, ST_GeographyFromText(?), radius_m)', [$origin]))
             ->when($shipment->truck_type_id !== null, fn ($query) => $query
-                ->whereHas('trucks', fn ($trucks) => $trucks
-                    ->where('truck_type_id', $shipment->truck_type_id)
-                    ->where('availability', '!=', TruckAvailability::Inactive)))
+                ->where(fn ($matching) => $matching
+                    ->whereDoesntHave('trucks')
+                    ->orWhereHas('trucks', fn ($trucks) => $trucks
+                        ->where('truck_type_id', $shipment->truck_type_id)
+                        ->where('availability', '!=', TruckAvailability::Inactive))))
             ->with('user')
             ->chunkById(100, function (Collection $profiles) use ($shipment) {
                 Notification::send($profiles->pluck('user'), new NewLoadAvailable($shipment));

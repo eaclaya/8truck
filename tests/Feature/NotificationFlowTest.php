@@ -62,13 +62,15 @@ test('a transporter is not notified about their own shipment', function () {
     Notification::assertNotSentTo($profile->user, NewLoadAvailable::class);
 });
 
-test('the truck type requirement filters the fan-out', function () {
+test('the truck type requirement filters fleets but not truck-less transporters', function () {
     Notification::fake();
 
     $requestedType = TruckType::factory()->create();
-    $withTruck = transporterCovering(14.0723, -87.1921);
-    Truck::factory()->for($withTruck)->create(['truck_type_id' => $requestedType->id]);
-    $withoutTruck = transporterCovering(14.0723, -87.1921);
+    $matchingFleet = transporterCovering(14.0723, -87.1921);
+    Truck::factory()->for($matchingFleet)->create(['truck_type_id' => $requestedType->id]);
+    $wrongFleet = transporterCovering(14.0723, -87.1921);
+    Truck::factory()->for($wrongFleet)->create();
+    $noTrucksYet = transporterCovering(14.0723, -87.1921);
 
     $shipment = Shipment::factory()->create([
         'origin' => new Point(14.09, -87.20),
@@ -77,8 +79,9 @@ test('the truck type requirement filters the fan-out', function () {
 
     app(PublishShipmentAction::class)->execute($shipment, $shipment->customer);
 
-    Notification::assertSentTo($withTruck->user, NewLoadAvailable::class);
-    Notification::assertNotSentTo($withoutTruck->user, NewLoadAvailable::class);
+    Notification::assertSentTo($matchingFleet->user, NewLoadAvailable::class);
+    Notification::assertNotSentTo($wrongFleet->user, NewLoadAvailable::class);
+    Notification::assertSentTo($noTrucksYet->user, NewLoadAvailable::class);
 });
 
 test('the customer is notified when a quote arrives', function () {
