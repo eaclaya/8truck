@@ -11,9 +11,10 @@ const props = defineProps<ToasterProps>()
 
 <template>
   <Sonner
+    v-bind="props"
     :class="cn('toaster group', props.class)"
-    :duration="5000"
-    rich-colors
+    :duration="props.duration ?? 5000"
+    :rich-colors="props.richColors ?? true"
     :style="{
       // Solid, saturated palette so toasts stand out in both themes:
       // blue for default/info, green for success, red for error,
@@ -35,7 +36,6 @@ const props = defineProps<ToasterProps>()
       '--warning-border': '#ea580c',
       '--border-radius': 'var(--radius)',
     }"
-    v-bind="props"
   >
     <template #success-icon>
       <CircleCheckIcon class="size-4" />
