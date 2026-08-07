@@ -33,6 +33,16 @@ class Truck extends Model
     use HasFactory;
 
     /**
+     * Mirror the database default so freshly created models expose a
+     * non-null availability without a refresh round-trip.
+     *
+     * @var array<string, mixed>
+     */
+    protected $attributes = [
+        'availability' => TruckAvailability::Available->value,
+    ];
+
+    /**
      * @return array<string, string>
      */
     protected function casts(): array

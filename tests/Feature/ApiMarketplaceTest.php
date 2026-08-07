@@ -162,3 +162,17 @@ test('catalogs are available to authenticated users', function () {
         ->assertOk()
         ->assertJsonStructure(['data' => [['id', 'name', 'department', 'lat', 'lng']]]);
 });
+
+test('a transporter can register a truck over the api', function () {
+    $transporter = apiTransporter();
+    $truckTypeId = $transporter->trucks()->value('truck_type_id');
+
+    $this->actingAs($transporter->user)->postJson('/api/v1/trucks', [
+        'truck_type_id' => $truckTypeId,
+        'plate_number' => 'API 9001',
+        'capacity_kg' => 12000,
+    ])
+        ->assertCreated()
+        ->assertJsonPath('data.plate_number', 'API 9001')
+        ->assertJsonPath('data.availability', 'available');
+});
