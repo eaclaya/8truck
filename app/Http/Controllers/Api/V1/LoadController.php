@@ -38,8 +38,20 @@ class LoadController extends Controller
             'destinationCity:id,name',
             'truckType:id,name',
             'customer:id,name',
+            'media',
         ]);
         $shipment->loadCount('quotes');
+
+        $myQuote = $shipment->quotes()
+            ->where('transporter_profile_id', $request->user()->transporterProfile->id)
+            ->first();
+
+        $shipment->setAttribute('has_my_quote', $myQuote !== null);
+        $shipment->setAttribute('my_quote', $myQuote === null ? null : [
+            'amount' => $myQuote->amount,
+            'currency' => $myQuote->currency,
+            'status' => $myQuote->status->value,
+        ]);
 
         return new ShipmentResource($shipment);
     }

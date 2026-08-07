@@ -61,6 +61,12 @@ test('the full marketplace journey works over the api', function () {
         'truck_id' => $transporter->trucks()->value('id'),
     ])->assertCreated()->json('data.id');
 
+    // The transporter's load view reflects their submitted quote.
+    $this->actingAs($transporter->user)->getJson("/api/v1/loads/{$shipmentId}")
+        ->assertOk()
+        ->assertJsonPath('data.has_my_quote', true)
+        ->assertJsonPath('data.my_quote.status', 'pending');
+
     // Customer sees the quote and accepts it.
     $this->actingAs($customer)->getJson("/api/v1/shipments/{$shipmentId}")
         ->assertOk()
