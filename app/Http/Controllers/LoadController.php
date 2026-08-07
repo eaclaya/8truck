@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Actions\Loads\FindAvailableLoadsAction;
 use App\Models\Shipment;
+use App\Models\TruckType;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 use Inertia\Inertia;
@@ -90,11 +91,12 @@ class LoadController extends Controller
                 'estimated_delivery_at' => $myQuote->estimated_delivery_at?->toDateTimeString(),
                 'notes' => $myQuote->notes,
             ] : null,
-            'trucks' => $transporter->trucks()->with('truckType:id,name')->get()
+            'trucks' => $transporter->trucks()->with('truckType:id,name')->orderBy('id')->get()
                 ->map(fn ($truck) => [
                     'id' => $truck->id,
                     'label' => $truck->truckType?->name.' · '.$truck->plate_number,
                 ]),
+            'truckTypes' => TruckType::query()->orderBy('name')->get(['id', 'name']),
             'canQuote' => $shipment->status->isOpenForQuotes() && $myQuote === null,
         ]);
     }

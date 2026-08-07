@@ -3,7 +3,6 @@
 use App\Models\City;
 use App\Models\OperatingRegion;
 use App\Models\TransporterProfile;
-use App\Models\TruckType;
 use App\Models\User;
 use Database\Seeders\RoleSeeder;
 use MatanYadaev\EloquentSpatial\Objects\Point;
@@ -74,16 +73,15 @@ test('the wizard shows current progress and catalogs', function () {
     $profile = TransporterProfile::factory()->verified()->create();
     OperatingRegion::factory()->for($profile)->create(['center' => new Point(14.07, -87.19)]);
     City::factory()->count(2)->create();
-    TruckType::factory()->create();
 
     $this->actingAs($profile->user)->get(route('onboarding'))
         ->assertOk()
         ->assertInertia(fn ($page) => $page
             ->component('onboarding/Index')
             ->has('regions', 1)
-            ->has('trucks', 0)
+            ->has('documents', 0)
             ->has('cities')
-            ->has('truckTypes')
+            ->missing('trucks')
         );
 });
 
@@ -91,22 +89,4 @@ test('customers cannot open the transporter wizard', function () {
     $this->actingAs(User::factory()->create())
         ->get(route('onboarding'))
         ->assertForbidden();
-});
-
-test('the truck endpoint stays on the wizard when asked', function () {
-    $profile = TransporterProfile::factory()->verified()->create();
-    $type = TruckType::factory()->create();
-
-    $response = $this->actingAs($profile->user)
-        ->from(route('onboarding'))
-        ->post(route('trucks.store'), [
-            'truck_type_id' => $type->id,
-            'plate_number' => 'WIZ 1234',
-            'capacity_kg' => 8000,
-            'stay' => 1,
-        ]);
-
-    $response->assertRedirect(route('onboarding'));
-
-    expect($profile->trucks()->count())->toBe(1);
 });

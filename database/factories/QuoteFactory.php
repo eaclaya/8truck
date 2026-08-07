@@ -6,6 +6,7 @@ use App\Enums\QuoteStatus;
 use App\Models\Quote;
 use App\Models\Shipment;
 use App\Models\TransporterProfile;
+use App\Models\Truck;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -21,6 +22,9 @@ class QuoteFactory extends Factory
         return [
             'shipment_id' => Shipment::factory()->quoted(),
             'transporter_profile_id' => TransporterProfile::factory(),
+            'truck_id' => fn (array $attributes) => Truck::factory()->create([
+                'transporter_profile_id' => $attributes['transporter_profile_id'],
+            ])->id,
             'amount' => fake()->randomFloat(2, 1000, 50000),
             'currency' => 'HNL',
             'estimated_pickup_at' => fake()->dateTimeBetween('+1 day', '+3 days'),

@@ -6,6 +6,7 @@ use App\Models\Quote;
 use App\Models\Shipment;
 use App\Models\TransporterProfile;
 use App\Models\Truck;
+use App\Models\TruckType;
 use App\Models\User;
 use MatanYadaev\EloquentSpatial\Objects\Point;
 
@@ -78,24 +79,72 @@ test('users without a transporter profile cannot open the load board', function 
 test('a transporter can submit a quote from the load page', function () {
     $profile = transporterWithRegionAt(14.0723, -87.1921);
     $shipment = publishedShipmentFrom(14.09, -87.20);
+    $truck = Truck::factory()->for($profile)->create();
 
     $response = $this->actingAs($profile->user)->post(route('loads.quote', $shipment), [
         'amount' => 12500,
+        'truck_id' => $truck->id,
     ]);
 
     $response->assertRedirect();
 
     expect($shipment->refresh()->status)->toBe(ShipmentStatus::Quoted)
-        ->and($shipment->quotes()->where('transporter_profile_id', $profile->id)->exists())->toBeTrue();
+        ->and($shipment->quotes()->where('transporter_profile_id', $profile->id)->value('truck_id'))->toBe($truck->id);
+});
+
+test('a quote without a truck is rejected', function () {
+    $profile = transporterWithRegionAt(14.0723, -87.1921);
+    $shipment = publishedShipmentFrom(14.09, -87.20);
+
+    $this->actingAs($profile->user)->post(route('loads.quote', $shipment), [
+        'amount' => 12500,
+    ])->assertSessionHasErrors('truck_id');
+
+    expect($shipment->quotes()->count())->toBe(0);
+});
+
+test('the load page carries truck types so the quote form can add one', function () {
+    $profile = transporterWithRegionAt(14.0723, -87.1921);
+    $shipment = publishedShipmentFrom(14.09, -87.20);
+    TruckType::factory()->create();
+
+    $this->actingAs($profile->user)->get(route('loads.show', $shipment))
+        ->assertOk()
+        ->assertInertia(fn ($page) => $page
+            ->component('loads/Show')
+            ->has('trucks', 0)
+            ->has('truckTypes', 1)
+            ->where('canQuote', true)
+        );
+});
+
+test('adding a truck from the load page returns to it', function () {
+    $profile = transporterWithRegionAt(14.0723, -87.1921);
+    $shipment = publishedShipmentFrom(14.09, -87.20);
+    $type = TruckType::factory()->create();
+
+    $this->actingAs($profile->user)
+        ->from(route('loads.show', $shipment))
+        ->post(route('trucks.store'), [
+            'truck_type_id' => $type->id,
+            'plate_number' => 'QTE 1234',
+            'capacity_kg' => 8000,
+            'stay' => 1,
+        ])
+        ->assertRedirect(route('loads.show', $shipment));
+
+    expect($profile->trucks()->count())->toBe(1);
 });
 
 test('submitting a second quote surfaces the domain error', function () {
     $profile = transporterWithRegionAt(14.0723, -87.1921);
     $shipment = publishedShipmentFrom(14.09, -87.20);
     Quote::factory()->for($shipment)->create(['transporter_profile_id' => $profile->id]);
+    $truck = Truck::factory()->for($profile)->create();
 
     $response = $this->actingAs($profile->user)->post(route('loads.quote', $shipment), [
         'amount' => 9000,
+        'truck_id' => $truck->id,
     ]);
 
     $response->assertSessionHasErrors('quote');

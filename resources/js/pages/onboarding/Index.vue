@@ -1,29 +1,20 @@
 <script setup lang="ts">
 import { Head, router, useForm } from '@inertiajs/vue3';
-import { Check, FileCheck, MapPin, Truck as TruckIcon } from '@lucide/vue';
+import { Check, FileCheck, MapPin } from '@lucide/vue';
 import { computed, ref } from 'vue';
 import InputError from '@/components/InputError.vue';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Spinner } from '@/components/ui/spinner';
 import { useTrans } from '@/composables/useTrans';
 import { dashboard } from '@/routes';
 import documentRoutes from '@/routes/documents';
 import regionRoutes from '@/routes/regions';
-import truckRoutes from '@/routes/trucks';
 
 interface RegionRow {
     id: number;
     name: string;
     radius_km: number;
-}
-
-interface TruckRow {
-    id: number;
-    plate_number: string;
-    truck_type: string | null;
-    capacity_kg: number;
 }
 
 interface DocumentRow {
@@ -38,17 +29,10 @@ interface CityOption {
     department: string;
 }
 
-interface TruckTypeOption {
-    id: number;
-    name: string;
-}
-
 const props = defineProps<{
     regions: RegionRow[];
-    trucks: TruckRow[];
     documents: DocumentRow[];
     cities: CityOption[];
-    truckTypes: TruckTypeOption[];
     documentTypes: string[];
 }>();
 
@@ -60,9 +44,7 @@ defineOptions({
 
 const { t } = useTrans();
 
-const step = ref(
-    props.regions.length === 0 ? 1 : props.trucks.length === 0 ? 2 : 3,
-);
+const step = ref(props.regions.length === 0 ? 1 : 2);
 
 const steps = computed(() => [
     {
@@ -73,12 +55,6 @@ const steps = computed(() => [
     },
     {
         number: 2,
-        title: t('Trucks'),
-        icon: TruckIcon,
-        done: props.trucks.length > 0,
-    },
-    {
-        number: 3,
         title: t('Documents'),
         icon: FileCheck,
         done: props.documents.length > 0,
@@ -98,22 +74,7 @@ function addRegion() {
     });
 }
 
-// --- Step 2: trucks ---
-const truckForm = useForm({
-    truck_type_id: '',
-    plate_number: '',
-    capacity_kg: '',
-    stay: 1,
-});
-
-function addTruck() {
-    truckForm.post(truckRoutes.store().url, {
-        preserveScroll: true,
-        onSuccess: () => truckForm.reset(),
-    });
-}
-
-// --- Step 3: documents (optional) ---
+// --- Step 2: documents (optional) ---
 const typeLabels: Record<string, string> = {
     driver_license: 'Driver license',
     national_id: 'National ID',
@@ -152,7 +113,7 @@ function finish() {
                 {{ t('Set up your transporter profile') }}
             </h1>
             <p class="text-sm text-muted-foreground">
-                {{ t('Step') }} {{ step }} / 3
+                {{ t('Step') }} {{ step }} / 2
             </p>
         </div>
 
@@ -256,101 +217,8 @@ function finish() {
             </div>
         </section>
 
-        <!-- Step 2: Trucks -->
+        <!-- Step 2: Documents (optional) -->
         <section v-if="step === 2" class="grid gap-4">
-            <div class="grid gap-1">
-                <h2 class="font-medium">{{ t('Your trucks') }}</h2>
-                <p class="text-sm text-muted-foreground">
-                    {{ t('Register at least one truck to quote loads.') }}
-                </p>
-            </div>
-
-            <ul v-if="trucks.length > 0" class="grid gap-2">
-                <li
-                    v-for="truck in trucks"
-                    :key="truck.id"
-                    class="flex items-center gap-2 rounded-lg border border-input px-3 py-2 text-sm"
-                >
-                    <TruckIcon class="size-4 text-muted-foreground" />
-                    {{ truck.truck_type }} · {{ truck.plate_number }} ·
-                    {{ truck.capacity_kg.toLocaleString() }} kg
-                </li>
-            </ul>
-
-            <form @submit.prevent="addTruck" class="grid gap-3">
-                <div class="grid gap-3 sm:grid-cols-3">
-                    <div class="grid gap-1">
-                        <Label for="truck_type_id">{{ t('Truck type') }}</Label>
-                        <select
-                            id="truck_type_id"
-                            v-model="truckForm.truck_type_id"
-                            required
-                            :class="selectClasses"
-                        >
-                            <option value="" disabled>
-                                {{ t('Select a type') }}
-                            </option>
-                            <option
-                                v-for="type in truckTypes"
-                                :key="type.id"
-                                :value="type.id"
-                            >
-                                {{ type.name }}
-                            </option>
-                        </select>
-                        <InputError :message="truckForm.errors.truck_type_id" />
-                    </div>
-                    <div class="grid gap-1">
-                        <Label for="plate_number">{{
-                            t('Plate number')
-                        }}</Label>
-                        <Input
-                            id="plate_number"
-                            v-model="truckForm.plate_number"
-                            required
-                            placeholder="AAB 1234"
-                        />
-                        <InputError :message="truckForm.errors.plate_number" />
-                    </div>
-                    <div class="grid gap-1">
-                        <Label for="capacity_kg">{{
-                            t('Capacity (kg)')
-                        }}</Label>
-                        <Input
-                            id="capacity_kg"
-                            v-model="truckForm.capacity_kg"
-                            type="number"
-                            min="100"
-                            required
-                            placeholder="10000"
-                        />
-                        <InputError :message="truckForm.errors.capacity_kg" />
-                    </div>
-                </div>
-                <div>
-                    <Button
-                        type="submit"
-                        variant="outline"
-                        :disabled="truckForm.processing"
-                    >
-                        <Spinner v-if="truckForm.processing" />
-                        {{ t('Add truck') }}
-                    </Button>
-                </div>
-            </form>
-
-            <div class="flex justify-between">
-                <Button variant="ghost" @click="step = 1">{{
-                    t('Back')
-                }}</Button>
-                <Button :disabled="trucks.length === 0" @click="step = 3">
-                    {{ t('Continue') }}
-                </Button>
-            </div>
-        </section>
-
-        <!-- Step 3: Documents (optional) -->
-        <section v-if="step === 3" class="grid gap-4">
             <div class="grid gap-1">
                 <h2 class="font-medium">{{ t('Verification documents') }}</h2>
                 <p class="text-sm text-muted-foreground">
@@ -423,7 +291,7 @@ function finish() {
             </form>
 
             <div class="flex justify-between">
-                <Button variant="ghost" @click="step = 2">{{
+                <Button variant="ghost" @click="step = 1">{{
                     t('Back')
                 }}</Button>
                 <Button @click="finish">

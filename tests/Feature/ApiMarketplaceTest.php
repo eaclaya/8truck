@@ -6,6 +6,7 @@ use App\Models\OperatingRegion;
 use App\Models\Quote;
 use App\Models\Shipment;
 use App\Models\TransporterProfile;
+use App\Models\Truck;
 use App\Models\User;
 use MatanYadaev\EloquentSpatial\Objects\Point;
 
@@ -22,6 +23,8 @@ function apiTransporter(): TransporterProfile
         'center' => new Point(14.0723, -87.1921),
         'radius_m' => 50000,
     ]);
+
+    Truck::factory()->for($profile)->create();
 
     return $profile;
 }
@@ -55,6 +58,7 @@ test('the full marketplace journey works over the api', function () {
 
     $quoteId = $this->actingAs($transporter->user)->postJson("/api/v1/loads/{$shipmentId}/quotes", [
         'amount' => 14500,
+        'truck_id' => $transporter->trucks()->value('id'),
     ])->assertCreated()->json('data.id');
 
     // Customer sees the quote and accepts it.
@@ -89,12 +93,28 @@ test('the full marketplace journey works over the api', function () {
 test('domain errors surface as 422 json', function () {
     $shipment = Shipment::factory()->published()->create();
     $transporter = apiTransporter();
+    $truckId = $transporter->trucks()->value('id');
 
-    $this->actingAs($transporter->user)->postJson("/api/v1/loads/{$shipment->id}/quotes", ['amount' => 1000]);
+    $this->actingAs($transporter->user)->postJson("/api/v1/loads/{$shipment->id}/quotes", [
+        'amount' => 1000,
+        'truck_id' => $truckId,
+    ]);
 
-    $this->actingAs($transporter->user)->postJson("/api/v1/loads/{$shipment->id}/quotes", ['amount' => 900])
+    $this->actingAs($transporter->user)->postJson("/api/v1/loads/{$shipment->id}/quotes", [
+        'amount' => 900,
+        'truck_id' => $truckId,
+    ])
         ->assertUnprocessable()
         ->assertJsonPath('message', __('marketplace.already_quoted'));
+});
+
+test('the api rejects a quote without a truck', function () {
+    $shipment = Shipment::factory()->published()->create();
+    $transporter = apiTransporter();
+
+    $this->actingAs($transporter->user)->postJson("/api/v1/loads/{$shipment->id}/quotes", ['amount' => 1000])
+        ->assertUnprocessable()
+        ->assertJsonValidationErrors('truck_id');
 });
 
 test('authorization is enforced over the api', function () {

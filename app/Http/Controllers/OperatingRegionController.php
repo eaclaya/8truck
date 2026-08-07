@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Actions\Regions\AddOperatingRegionsAction;
 use App\Http\Requests\StoreOperatingRegionRequest;
 use App\Models\City;
 use App\Models\OperatingRegion;
@@ -30,21 +31,16 @@ class OperatingRegionController extends Controller
         ]);
     }
 
-    public function store(StoreOperatingRegionRequest $request): RedirectResponse
+    public function store(StoreOperatingRegionRequest $request, AddOperatingRegionsAction $addRegions): RedirectResponse
     {
         $transporter = $request->user()->transporterProfile;
 
         abort_unless($transporter !== null, 403);
 
-        $city = City::query()->findOrFail((int) $request->validated()['city_id']);
-
-        $transporter->operatingRegions()->firstOrCreate(
-            ['city_id' => $city->id],
-            [
-                'name' => $city->name,
-                'center' => $city->location,
-                'radius_m' => $request->validated()['radius_km'] * 1000,
-            ],
+        $addRegions->execute(
+            $transporter,
+            $request->cityIds(),
+            (int) $request->validated()['radius_km'],
         );
 
         return back();

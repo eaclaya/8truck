@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useForm, Head } from '@inertiajs/vue3';
 import { Package, Truck } from '@lucide/vue';
-import { ref, watch } from 'vue';
+import { watch } from 'vue';
 import InputError from '@/components/InputError.vue';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';

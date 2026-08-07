@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers\Api\V1;
 
+use App\Actions\Regions\AddOperatingRegionsAction;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreOperatingRegionRequest;
-use App\Models\City;
 use App\Models\OperatingRegion;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -28,24 +28,25 @@ class RegionController extends Controller
         ]);
     }
 
-    public function store(StoreOperatingRegionRequest $request): JsonResponse
+    public function store(StoreOperatingRegionRequest $request, AddOperatingRegionsAction $addRegions): JsonResponse
     {
         $transporter = $request->user()->transporterProfile;
 
         abort_unless($transporter !== null, 403);
 
-        $city = City::query()->findOrFail((int) $request->validated()['city_id']);
+        $regions = $addRegions->execute(
+            $transporter,
+            $request->cityIds(),
+            (int) $request->validated()['radius_km'],
+        )->map(fn (OperatingRegion $region) => [
+            'id' => $region->id,
+            'name' => $region->name,
+        ]);
 
-        $region = $transporter->operatingRegions()->firstOrCreate(
-            ['city_id' => $city->id],
-            [
-                'name' => $city->name,
-                'center' => $city->location,
-                'radius_m' => $request->validated()['radius_km'] * 1000,
-            ],
-        );
-
-        return response()->json(['data' => ['id' => $region->id, 'name' => $region->name]], 201);
+        /** Single-city posts keep the object response the mobile client expects. */
+        return response()->json([
+            'data' => $request->has('city_ids') ? $regions : $regions->first(),
+        ], 201);
     }
 
     public function destroy(Request $request, OperatingRegion $operatingRegion): JsonResponse

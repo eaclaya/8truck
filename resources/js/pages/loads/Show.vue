@@ -1,5 +1,7 @@
 <script setup lang="ts">
 import { Head, useForm } from '@inertiajs/vue3';
+import { nextTick, ref } from 'vue';
+import AddTruckModal from '@/components/AddTruckModal.vue';
 import InputError from '@/components/InputError.vue';
 import ShipmentStatusBadge from '@/components/ShipmentStatusBadge.vue';
 import { Button } from '@/components/ui/button';
@@ -42,10 +44,16 @@ interface TruckOption {
     label: string;
 }
 
+interface TruckTypeOption {
+    id: number;
+    name: string;
+}
+
 const props = defineProps<{
     load: LoadDetail;
     myQuote: MyQuote | null;
     trucks: TruckOption[];
+    truckTypes: TruckTypeOption[];
     canQuote: boolean;
 }>();
 
@@ -60,7 +68,13 @@ defineOptions({
 
 const { t } = useTrans();
 
-const form = useForm({
+const form = useForm<{
+    amount: string;
+    truck_id: number | '';
+    estimated_pickup_at: string;
+    estimated_delivery_at: string;
+    notes: string;
+}>({
     amount: '',
     truck_id: '',
     estimated_pickup_at: '',
@@ -71,10 +85,11 @@ const form = useForm({
 const selectClasses =
     'flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-xs transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 dark:bg-input/30';
 
-function submit() {
+const showTruckModal = ref(false);
+
+function sendQuote() {
     form.transform((data) => ({
         ...data,
-        truck_id: data.truck_id === '' ? null : data.truck_id,
         estimated_pickup_at:
             data.estimated_pickup_at === '' ? null : data.estimated_pickup_at,
         estimated_delivery_at:
@@ -82,6 +97,33 @@ function submit() {
                 ? null
                 : data.estimated_delivery_at,
     })).post(quoteRoute.url(props.load.id));
+}
+
+/**
+ * A quote always travels on a truck, so a transporter without one is asked for
+ * it here rather than at signup. The quote continues once the truck exists.
+ */
+function submit() {
+    if (props.trucks.length === 0) {
+        showTruckModal.value = true;
+
+        return;
+    }
+
+    sendQuote();
+}
+
+async function onTruckAdded() {
+    await nextTick();
+
+    const newest = props.trucks.at(-1);
+
+    if (newest === undefined) {
+        return;
+    }
+
+    form.truck_id = newest.id;
+    sendQuote();
 }
 
 const formatMoney = (amount: string, currency: string) =>
@@ -232,16 +274,19 @@ const formatMoney = (amount: string, currency: string) =>
                         </div>
 
                         <div class="grid gap-2">
-                            <Label for="truck_id">{{
-                                t('Truck (optional)')
-                            }}</Label>
+                            <Label for="truck_id">{{ t('Truck') }}</Label>
                             <select
                                 id="truck_id"
                                 v-model="form.truck_id"
+                                :required="trucks.length > 0"
                                 :class="selectClasses"
                             >
-                                <option value="">
-                                    {{ t('No specific truck') }}
+                                <option value="" disabled>
+                                    {{
+                                        trucks.length > 0
+                                            ? t('Select a truck')
+                                            : t('No trucks registered yet')
+                                    }}
                                 </option>
                                 <option
                                     v-for="truck in trucks"
@@ -251,6 +296,16 @@ const formatMoney = (amount: string, currency: string) =>
                                     {{ truck.label }}
                                 </option>
                             </select>
+                            <p
+                                v-if="trucks.length === 0"
+                                class="text-sm text-muted-foreground"
+                            >
+                                {{
+                                    t(
+                                        'We will ask for your truck details when you send the quote.',
+                                    )
+                                }}
+                            </p>
                             <InputError :message="form.errors.truck_id" />
                         </div>
 
@@ -308,6 +363,12 @@ const formatMoney = (amount: string, currency: string) =>
                             {{ t('Send quote') }}
                         </Button>
                     </form>
+
+                    <AddTruckModal
+                        v-model:open="showTruckModal"
+                        :truck-types="truckTypes"
+                        @added="onTruckAdded"
+                    />
                 </template>
             </div>
         </div>

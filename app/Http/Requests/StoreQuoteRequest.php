@@ -15,7 +15,7 @@ class StoreQuoteRequest extends FormRequest
         return [
             'amount' => ['required', 'numeric', 'min:1', 'max:1000000'],
             'truck_id' => [
-                'nullable',
+                'required',
                 Rule::exists('trucks', 'id')->where(
                     'transporter_profile_id',
                     $this->user()->transporterProfile?->id,
