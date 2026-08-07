@@ -62,7 +62,15 @@ class ShipmentController extends Controller
                 ->with(['transporterProfile.user:id,name', 'truck.truckType:id,name'])
                 ->orderBy('amount'),
             'media',
+            'statusHistories' => fn ($query) => $query->with('actor:id,name')->latest(),
         ]);
+
+        $shipment->setAttribute('histories', $shipment->statusHistories
+            ->map(fn ($history) => [
+                'to_status' => $history->to_status->value,
+                'actor' => $history->actor?->name,
+                'created_at' => $history->created_at?->toIso8601String(),
+            ])->values()->all());
 
         return new ShipmentResource($shipment);
     }

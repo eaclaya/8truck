@@ -38,6 +38,7 @@ class ShipmentResource extends JsonResource
             'quotes_count' => $this->whenCounted('quotes'),
             'has_my_quote' => $this->when($this->has_my_quote !== null, fn (): bool => (bool) $this->has_my_quote),
             'my_quote' => $this->when($this->getAttribute('my_quote') !== null, fn () => $this->getAttribute('my_quote')),
+            'histories' => $this->when($this->getAttribute('histories') !== null, fn () => $this->getAttribute('histories')),
             'quotes' => QuoteResource::collection($this->whenLoaded('quotes')),
             'photos' => $this->whenLoaded('media', fn () => $this->getMedia('cargo')->map(fn ($media) => [
                 'id' => $media->id,

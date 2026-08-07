@@ -70,7 +70,8 @@ test('the full marketplace journey works over the api', function () {
     // Customer sees the quote and accepts it.
     $this->actingAs($customer)->getJson("/api/v1/shipments/{$shipmentId}")
         ->assertOk()
-        ->assertJsonCount(1, 'data.quotes');
+        ->assertJsonCount(1, 'data.quotes')
+        ->assertJsonPath('data.histories.0.to_status', 'quoted');
 
     $this->actingAs($customer)->postJson("/api/v1/quotes/{$quoteId}/accept")
         ->assertOk()
