@@ -7,8 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Spinner } from '@/components/ui/spinner';
 import { useTrans } from '@/composables/useTrans';
 import { dashboard } from '@/routes';
-import { advance } from '@/routes/jobs';
-import jobRoutes from '@/routes/jobs';
+import jobRoutes, { advance } from '@/routes/jobs';
 import loadRoutes from '@/routes/loads';
 import regionRoutes from '@/routes/regions';
 import shipmentRoutes from '@/routes/shipments';
@@ -98,11 +97,19 @@ function toggleTruckAvailability(truck: TruckChip) {
         <section class="grid gap-3">
             <div class="flex items-center justify-between">
                 <h2 class="font-medium">{{ t('My shipments') }}</h2>
-                <Button as-child variant="ghost" size="sm">
-                    <Link :href="shipmentRoutes.index()">{{
-                        t('View all')
-                    }}</Link>
-                </Button>
+                <div class="flex items-center gap-2">
+                    <Button as-child variant="ghost" size="sm">
+                        <Link :href="shipmentRoutes.index()">
+                            {{ t('View all') }}
+                        </Link>
+                    </Button>
+                    <Button as-child size="sm">
+                        <Link :href="shipmentRoutes.create()">
+                            <Plus class="size-4" />
+                            {{ t('New shipment') }}
+                        </Link>
+                    </Button>
+                </div>
             </div>
 
             <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
@@ -184,6 +191,17 @@ function toggleTruckAvailability(truck: TruckChip) {
                             <span v-else class="text-muted-foreground">
                                 {{ t('Confirm delivery') }}
                             </span>
+                            <Link
+                                :href="
+                                    shipmentRoutes.create({
+                                        query: { from: row.id },
+                                    })
+                                "
+                                :title="t('Repeat shipment')"
+                                class="text-muted-foreground hover:text-foreground"
+                            >
+                                <Copy class="size-4" />
+                            </Link>
                         </span>
                     </li>
                 </ul>
@@ -198,6 +216,46 @@ function toggleTruckAvailability(truck: TruckChip) {
                 </Button>
             </div>
 
+            <div
+                v-if="transporter.trucks.length > 0"
+                class="flex flex-wrap items-center gap-2"
+            >
+                <button
+                    v-for="truck in transporter.trucks"
+                    :key="truck.id"
+                    type="button"
+                    class="flex items-center gap-1.5 rounded-full border px-3 py-1 text-sm transition-colors"
+                    :class="
+                        truck.availability === 'available'
+                            ? 'border-emerald-300 bg-emerald-50 text-emerald-800 dark:border-emerald-800 dark:bg-emerald-950/40 dark:text-emerald-300'
+                            : truck.availability === 'busy'
+                              ? 'border-orange-300 bg-orange-50 text-orange-800 dark:border-orange-800 dark:bg-orange-950/40 dark:text-orange-300'
+                              : 'border-input bg-muted text-muted-foreground'
+                    "
+                    :title="t('Availability')"
+                    @click="toggleTruckAvailability(truck)"
+                >
+                    <span
+                        class="size-2 rounded-full"
+                        :class="
+                            truck.availability === 'available'
+                                ? 'bg-emerald-500'
+                                : truck.availability === 'busy'
+                                  ? 'bg-orange-500'
+                                  : 'bg-muted-foreground'
+                        "
+                    />
+                    {{ truck.plate_number }} ·
+                    {{
+                        truck.availability === 'available'
+                            ? t('Available')
+                            : truck.availability === 'busy'
+                              ? t('Busy')
+                              : t('Inactive')
+                    }}
+                </button>
+            </div>
+
             <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
                 <div
                     class="rounded-xl border border-sidebar-border/70 p-4 dark:border-sidebar-border"
@@ -208,6 +266,13 @@ function toggleTruckAvailability(truck: TruckChip) {
                     <p class="text-sm text-muted-foreground">
                         {{ t('Available loads') }}
                     </p>
+                    <Link
+                        v-if="transporter.stats.loads === 0"
+                        :href="regionRoutes.index()"
+                        class="text-xs text-primary hover:underline"
+                    >
+                        {{ t('Expand your regions') }}
+                    </Link>
                 </div>
                 <div
                     class="rounded-xl border border-sidebar-border/70 p-4 dark:border-sidebar-border"
@@ -228,6 +293,13 @@ function toggleTruckAvailability(truck: TruckChip) {
                     <p class="text-sm text-muted-foreground">
                         {{ t('Active jobs') }}
                     </p>
+                    <Link
+                        v-if="transporter.trucks.length === 0"
+                        :href="truckRoutes.create()"
+                        class="text-xs text-primary hover:underline"
+                    >
+                        {{ t('Add truck') }}
+                    </Link>
                 </div>
                 <div
                     class="rounded-xl border border-sidebar-border/70 p-4 dark:border-sidebar-border"
@@ -274,6 +346,33 @@ function toggleTruckAvailability(truck: TruckChip) {
                             >
                                 {{ job.pickup_date }}
                                 <ShipmentStatusBadge :status="job.status" />
+                                <Form
+                                    v-if="job.next_status"
+                                    v-bind="advance.form(job.id)"
+                                    v-slot="{ errors, processing }"
+                                >
+                                    <input
+                                        type="hidden"
+                                        name="status"
+                                        :value="job.next_status"
+                                    />
+                                    <Button
+                                        type="submit"
+                                        size="sm"
+                                        variant="outline"
+                                        :disabled="processing"
+                                    >
+                                        <Spinner v-if="processing" />
+                                        {{ t('advance.' + job.next_status) }}
+                                    </Button>
+                                    <InputError :message="errors.status" />
+                                </Form>
+                                <span
+                                    v-else-if="job.status === 'delivered'"
+                                    class="text-xs"
+                                >
+                                    {{ t('Waiting for customer confirmation') }}
+                                </span>
                             </span>
                         </li>
                     </ul>
