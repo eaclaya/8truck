@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { Form, Head, router } from '@inertiajs/vue3';
+import { Form, Head, Link, router } from '@inertiajs/vue3';
 import { useEcho } from '@laravel/echo-vue';
+import { Copy } from '@lucide/vue';
 import InputError from '@/components/InputError.vue';
 import RatingForm from '@/components/RatingForm.vue';
 import ShipmentStatusBadge from '@/components/ShipmentStatusBadge.vue';
@@ -116,6 +117,16 @@ const { t } = useTrans();
                     {{ shipment.origin_city }} → {{ shipment.destination_city }}
                 </h1>
                 <ShipmentStatusBadge :status="shipment.status" />
+                <Button as-child variant="ghost" size="sm">
+                    <Link
+                        :href="
+                            shipments.create({ query: { from: shipment.id } })
+                        "
+                    >
+                        <Copy class="size-4" />
+                        {{ t('Repeat shipment') }}
+                    </Link>
+                </Button>
             </div>
 
             <Form

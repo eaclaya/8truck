@@ -20,10 +20,23 @@ interface TruckTypeOption {
     name: string;
 }
 
-defineProps<{
+interface Prefill {
+    origin_city_id: number | null;
+    origin_address: string;
+    destination_city_id: number | null;
+    destination_address: string;
+    cargo_type: string;
+    weight_kg: number | null;
+    truck_type_id: number | null;
+    budget_amount: string | null;
+    special_instructions: string | null;
+}
+
+const props = defineProps<{
     cities: CityOption[];
     truckTypes: TruckTypeOption[];
     cargoTypes: string[];
+    prefill: Prefill | null;
 }>();
 
 defineOptions({
@@ -49,16 +62,16 @@ const form = useForm<{
     special_instructions: string;
     photos: File[];
 }>({
-    origin_city_id: '',
-    origin_address: '',
-    destination_city_id: '',
-    destination_address: '',
+    origin_city_id: props.prefill?.origin_city_id?.toString() ?? '',
+    origin_address: props.prefill?.origin_address ?? '',
+    destination_city_id: props.prefill?.destination_city_id?.toString() ?? '',
+    destination_address: props.prefill?.destination_address ?? '',
     pickup_date: '',
-    cargo_type: 'general',
-    weight_kg: '',
-    truck_type_id: '',
-    budget_amount: '',
-    special_instructions: '',
+    cargo_type: props.prefill?.cargo_type ?? 'general',
+    weight_kg: props.prefill?.weight_kg?.toString() ?? '',
+    truck_type_id: props.prefill?.truck_type_id?.toString() ?? '',
+    budget_amount: props.prefill?.budget_amount ?? '',
+    special_instructions: props.prefill?.special_instructions ?? '',
     photos: [],
 });
 

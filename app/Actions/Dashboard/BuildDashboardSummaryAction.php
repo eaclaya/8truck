@@ -69,6 +69,13 @@ class BuildDashboardSummaryAction
                 ->get();
 
             $transporter = [
+                'trucks' => $profile->trucks()->with('truckType:id,name')->get()
+                    ->map(fn ($truck) => [
+                        'id' => $truck->id,
+                        'plate_number' => $truck->plate_number,
+                        'truck_type' => $truck->truckType?->name,
+                        'availability' => $truck->availability->value,
+                    ])->values()->all(),
                 'stats' => [
                     'loads' => $this->findLoads->execute($profile)->count(),
                     'pendingQuotes' => $profile->quotes()->where('status', QuoteStatus::Pending)->count(),
@@ -87,6 +94,7 @@ class BuildDashboardSummaryAction
                     'destination_city' => $shipment->destinationLabel(),
                     'status' => $shipment->status->value,
                     'pickup_date' => $shipment->pickup_date->toDateString(),
+                    'next_status' => $shipment->status->nextTransporterStep()?->value,
                 ])->values()->all(),
                 'loads' => $loads->map(fn (Shipment $shipment) => [
                     'id' => $shipment->id,

@@ -128,3 +128,26 @@ test('the shipment detail page shows quotes and history to the owner', function 
             ->where('can.publish', false)
         );
 });
+
+test('the create page prefills from an owned shipment', function () {
+    $shipment = Shipment::factory()->create(['cargo_type' => 'perishable', 'weight_kg' => 7500]);
+
+    $this->actingAs($shipment->customer)
+        ->get(route('shipments.create', ['from' => $shipment->id]))
+        ->assertOk()
+        ->assertInertia(fn ($page) => $page
+            ->where('prefill.cargo_type', 'perishable')
+            ->where('prefill.weight_kg', 7500)
+            ->where('prefill.origin_address', $shipment->origin_address)
+        );
+});
+
+test('the create page ignores prefill from shipments the user does not own', function () {
+    $shipment = Shipment::factory()->create();
+    $stranger = User::factory()->create();
+
+    $this->actingAs($stranger)
+        ->get(route('shipments.create', ['from' => $shipment->id]))
+        ->assertOk()
+        ->assertInertia(fn ($page) => $page->where('prefill', null));
+});

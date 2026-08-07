@@ -5,6 +5,7 @@ use App\Models\OperatingRegion;
 use App\Models\Quote;
 use App\Models\Shipment;
 use App\Models\TransporterProfile;
+use App\Models\Truck;
 use App\Models\User;
 use MatanYadaev\EloquentSpatial\Objects\Point;
 
@@ -64,6 +65,19 @@ test('transporters additionally see loads and job widgets', function () {
             ->where('transporter.stats.loads', 1)
             ->where('transporter.stats.activeJobs', 1)
             ->has('transporter.jobs', 1)
+            ->where('transporter.jobs.0.next_status', 'driver_assigned')
             ->has('transporter.loads', 1)
+        );
+});
+
+test('the transporter dashboard lists trucks with availability for the quick toggle', function () {
+    $profile = TransporterProfile::factory()->verified()->create();
+    $truck = Truck::factory()->for($profile)->create();
+
+    $this->actingAs($profile->user)->get(route('dashboard'))
+        ->assertInertia(fn ($page) => $page
+            ->has('transporter.trucks', 1)
+            ->where('transporter.trucks.0.plate_number', $truck->plate_number)
+            ->where('transporter.trucks.0.availability', 'available')
         );
 });

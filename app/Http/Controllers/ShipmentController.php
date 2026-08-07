@@ -41,14 +41,35 @@ class ShipmentController extends Controller
         ]);
     }
 
-    public function create(): Response
+    public function create(Request $request): Response
     {
         Gate::authorize('create', Shipment::class);
+
+        $prefill = null;
+
+        if ($request->filled('from')) {
+            $source = Shipment::query()->find($request->integer('from'));
+
+            if ($source !== null && $request->user()->can('view', $source)) {
+                $prefill = [
+                    'origin_city_id' => $source->origin_city_id,
+                    'origin_address' => $source->origin_address,
+                    'destination_city_id' => $source->destination_city_id,
+                    'destination_address' => $source->destination_address,
+                    'cargo_type' => $source->cargo_type,
+                    'weight_kg' => $source->weight_kg,
+                    'truck_type_id' => $source->truck_type_id,
+                    'budget_amount' => $source->budget_amount,
+                    'special_instructions' => $source->special_instructions,
+                ];
+            }
+        }
 
         return Inertia::render('shipments/Create', [
             'cities' => City::query()->orderBy('name')->get(['id', 'name', 'department']),
             'truckTypes' => TruckType::query()->orderBy('name')->get(['id', 'name']),
             'cargoTypes' => config('marketplace.cargo_types'),
+            'prefill' => $prefill,
         ]);
     }
 

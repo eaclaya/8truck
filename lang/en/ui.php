@@ -266,4 +266,6 @@ return [
     'Upload' => 'Upload',
     'Skip for now' => 'Skip for now',
     'Finish' => 'Finish',
+    'Repeat shipment' => 'Repeat shipment',
+    'Expand your regions' => 'Expand your regions',
 ];

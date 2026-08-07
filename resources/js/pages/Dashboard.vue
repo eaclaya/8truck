@@ -1,12 +1,18 @@
 <script setup lang="ts">
-import { Head, Link } from '@inertiajs/vue3';
+import { Form, Head, Link, router } from '@inertiajs/vue3';
+import { Copy, Plus } from '@lucide/vue';
+import InputError from '@/components/InputError.vue';
 import ShipmentStatusBadge from '@/components/ShipmentStatusBadge.vue';
 import { Button } from '@/components/ui/button';
+import { Spinner } from '@/components/ui/spinner';
 import { useTrans } from '@/composables/useTrans';
 import { dashboard } from '@/routes';
+import { advance } from '@/routes/jobs';
 import jobRoutes from '@/routes/jobs';
 import loadRoutes from '@/routes/loads';
+import regionRoutes from '@/routes/regions';
 import shipmentRoutes from '@/routes/shipments';
+import truckRoutes, { update as updateTruck } from '@/routes/trucks';
 
 interface AttentionRow {
     id: number;
@@ -23,6 +29,14 @@ interface JobRow {
     destination_city: string;
     status: string;
     pickup_date: string;
+    next_status: string | null;
+}
+
+interface TruckChip {
+    id: number;
+    plate_number: string;
+    truck_type: string | null;
+    availability: string;
 }
 
 interface LoadRow {
@@ -45,6 +59,7 @@ defineProps<{
         attention: AttentionRow[];
     };
     transporter: {
+        trucks: TruckChip[];
         stats: {
             loads: number;
             pendingQuotes: number;
@@ -63,6 +78,17 @@ defineOptions({
 });
 
 const { t } = useTrans();
+
+function toggleTruckAvailability(truck: TruckChip) {
+    router.patch(
+        updateTruck.url(truck.id),
+        {
+            availability:
+                truck.availability === 'available' ? 'busy' : 'available',
+        },
+        { preserveScroll: true },
+    );
+}
 </script>
 
 <template>

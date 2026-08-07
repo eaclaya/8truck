@@ -56,6 +56,20 @@ enum ShipmentStatus: string implements HasLabel
         });
     }
 
+    /**
+     * The single forward step a transporter may take from this status.
+     */
+    public function nextTransporterStep(): ?self
+    {
+        return match ($this) {
+            self::Accepted => self::DriverAssigned,
+            self::DriverAssigned => self::PickedUp,
+            self::PickedUp => self::InTransit,
+            self::InTransit => self::Delivered,
+            default => null,
+        };
+    }
+
     public function canTransitionTo(self $status): bool
     {
         return in_array($status, $this->allowedTransitions(), true);

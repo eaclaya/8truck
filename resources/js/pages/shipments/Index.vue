@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Head, Link } from '@inertiajs/vue3';
-import { Plus } from '@lucide/vue';
+import { Copy, Plus } from '@lucide/vue';
 import ShipmentStatusBadge from '@/components/ShipmentStatusBadge.vue';
 import { Button } from '@/components/ui/button';
 import { useTrans } from '@/composables/useTrans';
@@ -91,6 +91,7 @@ const { t } = useTrans();
                         <th class="px-4 py-3 font-medium">{{ t('Cargo') }}</th>
                         <th class="px-4 py-3 font-medium">{{ t('Quotes') }}</th>
                         <th class="px-4 py-3 font-medium">{{ t('Status') }}</th>
+                        <th class="px-4 py-3 font-medium"></th>
                     </tr>
                 </thead>
                 <tbody>
@@ -115,6 +116,19 @@ const { t } = useTrans();
                         <td class="px-4 py-3">{{ shipment.quotes_count }}</td>
                         <td class="px-4 py-3">
                             <ShipmentStatusBadge :status="shipment.status" />
+                        </td>
+                        <td class="px-4 py-3 text-right">
+                            <Link
+                                :href="
+                                    shipmentRoutes.create({
+                                        query: { from: shipment.id },
+                                    })
+                                "
+                                :title="t('Repeat shipment')"
+                                class="text-muted-foreground hover:text-foreground"
+                            >
+                                <Copy class="size-4" />
+                            </Link>
                         </td>
                     </tr>
                 </tbody>

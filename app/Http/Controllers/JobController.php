@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Actions\Shipments\FindReturnTripsAction;
-use App\Enums\ShipmentStatus;
 use App\Models\Shipment;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -32,7 +31,7 @@ class JobController extends Controller
             ->through(fn (Shipment $shipment) => [
                 'id' => $shipment->id,
                 'status' => $shipment->status->value,
-                'next_status' => $this->nextStatus($shipment->status)?->value,
+                'next_status' => $shipment->status->nextTransporterStep()?->value,
                 'origin_city' => $shipment->originCity?->name,
                 'destination_city' => $shipment->destinationCity?->name,
                 'pickup_date' => $shipment->pickup_date->toDateString(),
@@ -49,19 +48,5 @@ class JobController extends Controller
         return Inertia::render('jobs/Index', [
             'jobs' => $jobs,
         ]);
-    }
-
-    /**
-     * The single forward step a transporter may take from each status.
-     */
-    private function nextStatus(ShipmentStatus $status): ?ShipmentStatus
-    {
-        return match ($status) {
-            ShipmentStatus::Accepted => ShipmentStatus::DriverAssigned,
-            ShipmentStatus::DriverAssigned => ShipmentStatus::PickedUp,
-            ShipmentStatus::PickedUp => ShipmentStatus::InTransit,
-            ShipmentStatus::InTransit => ShipmentStatus::Delivered,
-            default => null,
-        };
     }
 }

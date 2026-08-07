@@ -278,4 +278,6 @@ return [
     'Upload' => 'Subir',
     'Skip for now' => 'Omitir por ahora',
     'Finish' => 'Finalizar',
+    'Repeat shipment' => 'Repetir envío',
+    'Expand your regions' => 'Amplía tus regiones',
 ];
